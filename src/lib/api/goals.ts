@@ -1,48 +1,64 @@
 import { apiGet, apiPost, apiPatch, apiDelete } from "./client";
-import type { Goal, CreateGoalDto, UpdateGoalDto, GoalProgress } from "@/types";
+import type {
+  Goal,
+  CreateGoalDto,
+  UpdateGoalDto,
+  GoalProgress,
+  LinkTaskToGoalDto,
+} from "@/types";
 
 /**
  * Fetch all goals
- * To be implemented in Phase 6
  */
-export async function getGoals(): Promise<{ goals: Goal[] }> {
+export async function getGoals() {
   return apiGet<{ goals: Goal[] }>("/goals");
 }
 
 /**
  * Fetch single goal by ID
  */
-export async function getGoal(id: string): Promise<Goal> {
+export async function getGoal(id: string) {
   return apiGet<Goal>(`/goals/${id}`);
 }
 
 /**
  * Create new goal
  */
-export async function createGoal(data: CreateGoalDto): Promise<Goal> {
+export async function createGoal(data: CreateGoalDto) {
   return apiPost<Goal>("/goals", data);
 }
 
 /**
  * Update existing goal
  */
-export async function updateGoal(
-  id: string,
-  data: UpdateGoalDto,
-): Promise<Goal> {
+export async function updateGoal(id: string, data: UpdateGoalDto) {
   return apiPatch<Goal>(`/goals/${id}`, data);
 }
 
 /**
  * Delete goal
  */
-export async function deleteGoal(id: string): Promise<void> {
+export async function deleteGoal(id: string) {
   return apiDelete<void>(`/goals/${id}`);
 }
 
 /**
- * Get goal progress
+ * Get goal progress details
  */
-export async function getGoalProgress(id: string): Promise<GoalProgress> {
+export async function getGoalProgress(id: string) {
   return apiGet<GoalProgress>(`/goals/${id}/progress`);
+}
+
+/**
+ * Link task to goal
+ */
+export async function linkTaskToGoal(data: LinkTaskToGoalDto) {
+  return apiPost<void>("/goals/link-task", data);
+}
+
+/**
+ * Unlink task from goal
+ */
+export async function unlinkTaskFromGoal(taskId: string, goalId: string) {
+  return apiDelete<void>(`/goals/${goalId}/tasks/${taskId}`);
 }

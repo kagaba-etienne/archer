@@ -1,17 +1,52 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiPost, apiPatch, apiDelete } from "@/lib/api/client";
+import {
+  createGoal,
+  updateGoal,
+  deleteGoal,
+  linkTaskToGoal,
+  unlinkTaskFromGoal,
+} from "@/lib/api/goals";
 import { queryKeys } from "../queryClient";
-import type { Goal, CreateGoalDto, UpdateGoalDto } from "@/types";
+import type { Goal, UpdateGoalDto } from "@/types";
 
 /**
  * Create new goal
- * To be implemented in Phase 6
  */
 export function useCreateGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateGoalDto) => apiPost<Goal>("/goals", data),
+    mutationFn: createGoal,
+
+    onMutate: async (newGoal) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.goals.all });
+      const previousGoals = queryClient.getQueryData<Goal[]>(
+        queryKeys.goals.list,
+      );
+
+      if (previousGoals) {
+        queryClient.setQueryData<Goal[]>(queryKeys.goals.list, (old = []) => [
+          {
+            ...newGoal,
+            id: "temp-" + Date.now(),
+            userId: "current-user",
+            progress: 0,
+            taskIds: [],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          } as Goal,
+          ...old,
+        ]);
+      }
+
+      return { previousGoals };
+    },
+
+    onError: (err, newGoal, context) => {
+      if (context?.previousGoals) {
+        queryClient.setQueryData(queryKeys.goals.list, context.previousGoals);
+      }
+    },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
@@ -28,12 +63,34 @@ export function useUpdateGoal() {
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateGoalDto }) =>
-      apiPatch<Goal>(`/goals/${id}`, data),
+      updateGoal(id, data),
+
+    onMutate: async ({ id, data }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.goals.all });
+      const previousGoals = queryClient.getQueryData<Goal[]>(
+        queryKeys.goals.list,
+      );
+
+      if (previousGoals) {
+        queryClient.setQueryData<Goal[]>(queryKeys.goals.list, (old = []) =>
+          old.map((goal) =>
+            goal.id === id ? { ...goal, ...data, updatedAt: new Date() } : goal,
+          ),
+        );
+      }
+
+      return { previousGoals };
+    },
+
+    onError: (err, variables, context) => {
+      if (context?.previousGoals) {
+        queryClient.setQueryData(queryKeys.goals.list, context.previousGoals);
+      }
+    },
 
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.goals.detail(id) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.insights.alignment });
     },
   });
 }
@@ -45,10 +102,65 @@ export function useDeleteGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => apiDelete<void>(`/goals/${id}`),
+    mutationFn: deleteGoal,
+
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.goals.all });
+      const previousGoals = queryClient.getQueryData<Goal[]>(
+        queryKeys.goals.list,
+      );
+
+      if (previousGoals) {
+        queryClient.setQueryData<Goal[]>(queryKeys.goals.list, (old = []) =>
+          old.filter((goal) => goal.id !== id),
+        );
+      }
+
+      return { previousGoals };
+    },
+
+    onError: (err, id, context) => {
+      if (context?.previousGoals) {
+        queryClient.setQueryData(queryKeys.goals.list, context.previousGoals);
+      }
+    },
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.alignment });
+    },
+  });
+}
+
+/**
+ * Link task to goal
+ */
+export function useLinkTaskToGoal() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: linkTaskToGoal,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.alignment });
+    },
+  });
+}
+
+/**
+ * Unlink task from goal
+ */
+export function useUnlinkTaskFromGoal() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ taskId, goalId }: { taskId: string; goalId: string }) =>
+      unlinkTaskFromGoal(taskId, goalId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.insights.alignment });
     },
   });
