@@ -24,25 +24,33 @@ export function useCreateTask() {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: queryKeys.tasks.all });
 
-      // Snapshot previous value
-      const previousTasks = queryClient.getQueryData<Task[]>(
+      // Snapshot previous value - note the data structure is { tasks: Task[] }
+      const previousTasks = queryClient.getQueryData<{ tasks: Task[] }>(
         queryKeys.tasks.list(),
       );
 
       // Optimistically update cache
       if (previousTasks) {
-        queryClient.setQueryData<Task[]>(queryKeys.tasks.list(), (old = []) => [
-          {
-            ...newTask,
-            id: "temp-" + Date.now(),
-            userId: "current-user",
-            status: "created",
-            goalIds: newTask.goalIds || [],
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          } as Task,
-          ...old,
-        ]);
+        queryClient.setQueryData<{ tasks: Task[] }>(
+          queryKeys.tasks.list(),
+          (old) => {
+            if (!old) return old;
+            return {
+              tasks: [
+                {
+                  ...newTask,
+                  id: "temp-" + Date.now(),
+                  userId: "current-user",
+                  status: "created",
+                  goalIds: newTask.goalIds || [],
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                } as Task,
+                ...old.tasks,
+              ],
+            };
+          },
+        );
       }
 
       return { previousTasks };
@@ -76,30 +84,58 @@ export function useUpdateTask() {
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.tasks.all });
 
-      const previousTasks = queryClient.getQueryData<Task[]>(
-        queryKeys.tasks.list(),
-      );
+      // Get all task queries in the cache
+      const previousData: Array<{
+        queryKey: readonly unknown[];
+        data: { tasks: Task[] };
+      }> = [];
 
-      if (previousTasks) {
-        queryClient.setQueryData<Task[]>(queryKeys.tasks.list(), (old = []) =>
-          old.map((task) =>
-            task.id === id ? { ...task, ...data, updatedAt: new Date() } : task,
-          ),
-        );
-      }
+      queryClient
+        .getQueryCache()
+        .findAll({
+          queryKey: queryKeys.tasks.all,
+          type: "active",
+        })
+        .forEach((query) => {
+          const oldData = query.state.data as { tasks: Task[] } | undefined;
+          if (oldData && oldData.tasks) {
+            previousData.push({
+              queryKey: query.queryKey,
+              data: oldData,
+            });
 
-      return { previousTasks };
+            // Update the task in this specific query - note the data structure is { tasks: Task[] }
+            queryClient.setQueryData<{ tasks: Task[] }>(
+              query.queryKey,
+              (old) => {
+                if (!old) return old;
+                return {
+                  tasks: old.tasks.map((task) =>
+                    task.id === id
+                      ? { ...task, ...data, updatedAt: new Date() }
+                      : task,
+                  ),
+                };
+              },
+            );
+          }
+        });
+
+      return { previousData };
     },
 
     onError: (err, variables, context) => {
-      if (context?.previousTasks) {
-        queryClient.setQueryData(queryKeys.tasks.list(), context.previousTasks);
+      // Rollback all updated queries
+      if (context?.previousData) {
+        context.previousData.forEach(({ queryKey, data }) => {
+          queryClient.setQueryData(queryKey, data);
+        });
       }
     },
 
-    onSuccess: (_, { id }) => {
+    onSettled: () => {
+      // Refetch in the background to ensure data consistency
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.detail(id) });
       queryClient.invalidateQueries({ queryKey: queryKeys.insights.alignment });
     },
   });
@@ -117,13 +153,19 @@ export function useDeleteTask() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.tasks.all });
 
-      const previousTasks = queryClient.getQueryData<Task[]>(
+      const previousTasks = queryClient.getQueryData<{ tasks: Task[] }>(
         queryKeys.tasks.list(),
       );
 
       if (previousTasks) {
-        queryClient.setQueryData<Task[]>(queryKeys.tasks.list(), (old = []) =>
-          old.filter((task) => task.id !== id),
+        queryClient.setQueryData<{ tasks: Task[] }>(
+          queryKeys.tasks.list(),
+          (old) => {
+            if (!old) return old;
+            return {
+              tasks: old.tasks.filter((task) => task.id !== id),
+            };
+          },
         );
       }
 

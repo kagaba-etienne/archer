@@ -2,14 +2,15 @@ import { Plus } from "lucide-react";
 import { Button, LoadingSkeleton, ErrorState } from "@/components/ui";
 import { TaskCard } from "./TaskCard";
 import { useTasksQuery } from "@/services/queries/useTasks";
-import type { TaskFilters } from "@/types";
+import type { TaskFilters, Task } from "@/types";
 
 export interface TaskListProps {
   filters?: TaskFilters;
   onCreateTask?: () => void;
+  onEditTask?: (task: Task) => void;
 }
 
-export function TaskList({ filters, onCreateTask }: TaskListProps) {
+export function TaskList({ filters, onCreateTask, onEditTask }: TaskListProps) {
   const { data: tasks, isLoading, error } = useTasksQuery(filters);
 
   if (isLoading) {
@@ -46,9 +47,9 @@ export function TaskList({ filters, onCreateTask }: TaskListProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 lg:columns-2 lg:gap-2">
       {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
+        <TaskCard key={task.id} task={task} onEdit={onEditTask} />
       ))}
     </div>
   );

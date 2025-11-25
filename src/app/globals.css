@@ -319,3 +319,29 @@
   background: var(--bg-gray) !important;
   color: var(--text-primary) !important;
 }
+
+/* Custom Scrollbar for Kanban View */
+.kanban-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.kanban-scrollbar::-webkit-scrollbar-track {
+  background: var(--bg-light);
+  border-radius: var(--radius-full);
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast);
+}
+
+.kanban-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+}
+
+/* Firefox scrollbar */
+.kanban-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--bg-light);
+}

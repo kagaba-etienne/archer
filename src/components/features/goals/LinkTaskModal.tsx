@@ -43,7 +43,7 @@ export function LinkTaskModal({
           />
         </div>
 
-        <div className="max-h-96 overflow-y-auto space-y-2">
+        <div className="max-h-96 overflow-y-auto no-scrollbar space-y-2">
           {isLoading ? (
             [...Array(3)].map((_, i) => (
               <LoadingSkeleton key={i} variant="rectangular" height={60} />

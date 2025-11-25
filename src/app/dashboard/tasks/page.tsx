@@ -7,22 +7,51 @@ import { TaskList } from "@/components/features/tasks/TaskList";
 import { TaskKanban } from "@/components/features/tasks/TaskKanban";
 import { TaskFilters } from "@/components/features/tasks/TaskFilters";
 import { TaskForm } from "@/components/features/tasks/TaskForm";
-import { useCreateTask } from "@/services/mutations/useTasks";
-import type { TaskFilters as TaskFiltersType, CreateTaskDto } from "@/types";
+import { useCreateTask, useUpdateTask } from "@/services/mutations/useTasks";
+import type {
+  TaskFilters as TaskFiltersType,
+  CreateTaskDto,
+  Task,
+} from "@/types";
 
 export default function TasksPage() {
   const [view, setView] = useState<"list" | "kanban">("list");
   const [filters, setFilters] = useState<TaskFiltersType>({});
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | undefined>(undefined);
 
   const createTask = useCreateTask();
+  const updateTask = useUpdateTask();
 
-  const handleCreateTask = (data: CreateTaskDto) => {
-    createTask.mutate(data, {
-      onSuccess: () => {
-        setIsFormOpen(false);
-      },
-    });
+  const handleSubmitTask = (data: CreateTaskDto) => {
+    if (editingTask) {
+      updateTask.mutate(
+        { id: editingTask.id, data },
+        {
+          onSuccess: () => {
+            setIsFormOpen(false);
+            setEditingTask(undefined);
+          },
+        },
+      );
+    } else {
+      createTask.mutate(data, {
+        onSuccess: () => {
+          setIsFormOpen(false);
+          setEditingTask(undefined);
+        },
+      });
+    }
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setIsFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setEditingTask(undefined);
   };
 
   return (
@@ -69,7 +98,11 @@ export default function TasksPage() {
 
         {/* Filters */}
         <Card>
-          <TaskFilters filters={filters} onChange={setFilters} />
+          <TaskFilters
+            filters={filters}
+            onChange={setFilters}
+            viewMode={view}
+          />
         </Card>
 
         {/* Task Views */}
@@ -78,18 +111,20 @@ export default function TasksPage() {
             <TaskList
               filters={filters}
               onCreateTask={() => setIsFormOpen(true)}
+              onEditTask={handleEditTask}
             />
           ) : (
-            <TaskKanban />
+            <TaskKanban filters={filters} onEditTask={handleEditTask} />
           )}
         </div>
 
         {/* Task Form Modal */}
         <TaskForm
           isOpen={isFormOpen}
-          onClose={() => setIsFormOpen(false)}
-          onSubmit={handleCreateTask}
-          isLoading={createTask.isPending}
+          onClose={handleCloseForm}
+          onSubmit={handleSubmitTask}
+          initialData={editingTask}
+          isLoading={createTask.isPending || updateTask.isPending}
         />
       </div>
     </div>

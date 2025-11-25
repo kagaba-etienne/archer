@@ -1,6 +1,17 @@
 import { http, HttpResponse, delay } from "msw";
-import type { User, LoginCredentials, RegisterUserDto } from "@/types";
-import { mockUser, mockCredentials } from "./data";
+import type {
+  User,
+  LoginCredentials,
+  RegisterUserDto,
+  Goal,
+  CreateGoalDto,
+  UpdateGoalDto,
+  LinkTaskToGoalDto,
+  Task,
+  CreateTaskDto,
+  UpdateTaskDto,
+} from "@/types";
+import { mockUser, mockCredentials, mockGoals, mockTasks } from "./data";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
@@ -10,6 +21,16 @@ const API_BASE_URL =
  * In a real scenario, this would be managed by httpOnly cookies
  */
 let currentUser: User | null = null;
+
+/**
+ * Simulated goals storage
+ */
+let goals: Goal[] = [...mockGoals];
+
+/**
+ * Simulated tasks storage
+ */
+let tasks: Task[] = [...mockTasks];
 
 /**
  * MSW handlers for authentication endpoints
@@ -187,10 +208,454 @@ export const authHandlers = [
 ];
 
 /**
+ * MSW handlers for goal endpoints
+ */
+export const goalHandlers = [
+  /**
+   * GET /goals
+   * Get all goals for authenticated user
+   */
+  http.get(`${API_BASE_URL}/goals`, async () => {
+    await delay(300);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const userGoals = goals.filter((goal) => goal.userId === currentUser!.id);
+    return HttpResponse.json({ goals: userGoals }, { status: 200 });
+  }),
+
+  /**
+   * GET /goals/:id
+   * Get single goal by ID
+   */
+  http.get(`${API_BASE_URL}/goals/:id`, async ({ params }) => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const goal = goals.find((g) => g.id === params.id);
+
+    if (!goal || goal.userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Goal not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    return HttpResponse.json(goal, { status: 200 });
+  }),
+
+  /**
+   * POST /goals
+   * Create new goal
+   */
+  http.post(`${API_BASE_URL}/goals`, async ({ request }) => {
+    await delay(400);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const data = (await request.json()) as CreateGoalDto;
+
+    const newGoal: Goal = {
+      id: `goal-${Date.now()}`,
+      userId: currentUser.id,
+      title: data.title,
+      description: data.description,
+      horizon: data.horizon,
+      targetDate: data.targetDate,
+      progress: 0,
+      taskIds: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    goals.push(newGoal);
+
+    return HttpResponse.json(newGoal, { status: 201 });
+  }),
+
+  /**
+   * PATCH /goals/:id
+   * Update existing goal
+   */
+  http.patch(`${API_BASE_URL}/goals/:id`, async ({ params, request }) => {
+    await delay(350);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const goalIndex = goals.findIndex((g) => g.id === params.id);
+
+    if (goalIndex === -1 || goals[goalIndex].userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Goal not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    const updates = (await request.json()) as UpdateGoalDto;
+
+    goals[goalIndex] = {
+      ...goals[goalIndex],
+      ...updates,
+      updatedAt: new Date(),
+    };
+
+    return HttpResponse.json(goals[goalIndex], { status: 200 });
+  }),
+
+  /**
+   * DELETE /goals/:id
+   * Delete goal
+   */
+  http.delete(`${API_BASE_URL}/goals/:id`, async ({ params }) => {
+    await delay(300);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const goalIndex = goals.findIndex((g) => g.id === params.id);
+
+    if (goalIndex === -1 || goals[goalIndex].userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Goal not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    goals.splice(goalIndex, 1);
+
+    return HttpResponse.json(null, { status: 204 });
+  }),
+
+  /**
+   * GET /goals/:id/progress
+   * Get goal progress details
+   */
+  http.get(`${API_BASE_URL}/goals/:id/progress`, async ({ params }) => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const goal = goals.find((g) => g.id === params.id);
+
+    if (!goal || goal.userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Goal not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    return HttpResponse.json(
+      {
+        goalId: goal.id,
+        totalTasks: goal.taskIds.length,
+        completedTasks: Math.floor(goal.taskIds.length * (goal.progress / 100)),
+        inProgressTasks: Math.ceil(
+          goal.taskIds.length * (1 - goal.progress / 100),
+        ),
+        percentage: goal.progress,
+      },
+      { status: 200 },
+    );
+  }),
+
+  /**
+   * POST /goals/link-task
+   * Link task to goal
+   */
+  http.post(`${API_BASE_URL}/goals/link-task`, async ({ request }) => {
+    await delay(250);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const data = (await request.json()) as LinkTaskToGoalDto;
+
+    const goalIndex = goals.findIndex((g) => g.id === data.goalId);
+
+    if (goalIndex === -1 || goals[goalIndex].userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Goal not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    if (!goals[goalIndex].taskIds.includes(data.taskId)) {
+      goals[goalIndex].taskIds.push(data.taskId);
+      goals[goalIndex].updatedAt = new Date();
+    }
+
+    return HttpResponse.json(null, { status: 204 });
+  }),
+
+  /**
+   * DELETE /goals/:goalId/tasks/:taskId
+   * Unlink task from goal
+   */
+  http.delete(
+    `${API_BASE_URL}/goals/:goalId/tasks/:taskId`,
+    async ({ params }) => {
+      await delay(250);
+
+      if (!currentUser) {
+        return HttpResponse.json(
+          { message: "Authentication required", code: "UNAUTHORIZED" },
+          { status: 401 },
+        );
+      }
+
+      const goalIndex = goals.findIndex((g) => g.id === params.goalId);
+
+      if (goalIndex === -1 || goals[goalIndex].userId !== currentUser.id) {
+        return HttpResponse.json(
+          { message: "Goal not found", code: "NOT_FOUND" },
+          { status: 404 },
+        );
+      }
+
+      goals[goalIndex].taskIds = goals[goalIndex].taskIds.filter(
+        (id) => id !== params.taskId,
+      );
+      goals[goalIndex].updatedAt = new Date();
+
+      return HttpResponse.json(null, { status: 204 });
+    },
+  ),
+];
+
+/**
+ * MSW handlers for task endpoints
+ */
+export const taskHandlers = [
+  /**
+   * GET /tasks
+   * Get all tasks for authenticated user with optional filters
+   */
+  http.get(`${API_BASE_URL}/tasks`, async ({ request }) => {
+    await delay(300);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const url = new URL(request.url);
+    const status = url.searchParams.get("status");
+    const priority = url.searchParams.get("priority");
+    const goalId = url.searchParams.get("goalId");
+
+    let userTasks = tasks.filter((task) => task.userId === currentUser!.id);
+
+    // Apply filters
+    if (status) {
+      userTasks = userTasks.filter((task) => task.status === status);
+    }
+    if (priority) {
+      userTasks = userTasks.filter((task) => task.priority === priority);
+    }
+    if (goalId) {
+      userTasks = userTasks.filter((task) => task.goalIds?.includes(goalId));
+    }
+
+    return HttpResponse.json({ tasks: userTasks }, { status: 200 });
+  }),
+
+  /**
+   * GET /tasks/:id
+   * Get single task by ID
+   */
+  http.get(`${API_BASE_URL}/tasks/:id`, async ({ params }) => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const task = tasks.find((t) => t.id === params.id);
+
+    if (!task || task.userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Task not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    return HttpResponse.json(task, { status: 200 });
+  }),
+
+  /**
+   * POST /tasks
+   * Create new task
+   */
+  http.post(`${API_BASE_URL}/tasks`, async ({ request }) => {
+    await delay(400);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const data = (await request.json()) as CreateTaskDto;
+
+    const newTask: Task = {
+      id: `task-${Date.now()}`,
+      userId: currentUser.id,
+      title: data.title,
+      description: data.description,
+      priority: data.priority,
+      status: "created",
+      dueDate: data.dueDate,
+      goalIds: data.goalIds || [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    tasks.push(newTask);
+
+    return HttpResponse.json(newTask, { status: 201 });
+  }),
+
+  /**
+   * PATCH /tasks/:id
+   * Update existing task
+   */
+  http.patch(`${API_BASE_URL}/tasks/:id`, async ({ params, request }) => {
+    await delay(350);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const taskIndex = tasks.findIndex((t) => t.id === params.id);
+
+    if (taskIndex === -1 || tasks[taskIndex].userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Task not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    const updates = (await request.json()) as UpdateTaskDto;
+
+    tasks[taskIndex] = {
+      ...tasks[taskIndex],
+      ...updates,
+      updatedAt: new Date(),
+    };
+
+    return HttpResponse.json(tasks[taskIndex], { status: 200 });
+  }),
+
+  /**
+   * DELETE /tasks/:id
+   * Delete task
+   */
+  http.delete(`${API_BASE_URL}/tasks/:id`, async ({ params }) => {
+    await delay(300);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const taskIndex = tasks.findIndex((t) => t.id === params.id);
+
+    if (taskIndex === -1 || tasks[taskIndex].userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Task not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    tasks.splice(taskIndex, 1);
+
+    return HttpResponse.json(null, { status: 204 });
+  }),
+
+  /**
+   * GET /tasks/stats
+   * Get task statistics for authenticated user
+   */
+  http.get(`${API_BASE_URL}/tasks/stats`, async () => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const userTasks = tasks.filter((task) => task.userId === currentUser!.id);
+
+    const stats = {
+      total: userTasks.length,
+      completed: userTasks.filter((t) => t.status === "completed").length,
+      inProgress: userTasks.filter((t) => t.status === "in-progress").length,
+      blocked: userTasks.filter((t) => t.status === "blocked").length,
+      scheduled: userTasks.filter((t) => t.status === "scheduled").length,
+      created: userTasks.filter((t) => t.status === "created").length,
+      highPriority: userTasks.filter((t) => t.priority === "high").length,
+      mediumPriority: userTasks.filter((t) => t.priority === "medium").length,
+      lowPriority: userTasks.filter((t) => t.priority === "low").length,
+    };
+
+    return HttpResponse.json(stats, { status: 200 });
+  }),
+];
+
+/**
  * Helper function to reset mock session (useful for tests)
  */
 export function resetMockSession(): void {
   currentUser = null;
+  goals = [...mockGoals];
+  tasks = [...mockTasks];
 }
 
 /**

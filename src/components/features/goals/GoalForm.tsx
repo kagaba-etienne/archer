@@ -79,7 +79,7 @@ export function GoalForm({
             Description
           </label>
           <textarea
-            className="w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+            className="w-full px-3 py-2 focus:outline-0 border border-border-medium rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
             rows={3}
             placeholder="Goal description (optional)"
             {...register("description")}
@@ -96,7 +96,7 @@ export function GoalForm({
             Horizon
           </label>
           <select
-            className="w-full px-3 py-2 border border-border-medium rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+            className="w-full px-3 focus:outline-0 py-2 border border-border-medium rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
             {...register("horizon")}
           >
             <option value="short-term">Short-term (0-3 months)</option>

@@ -12,6 +12,7 @@ import { useAuthStore } from "@/stores/authStore";
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/dashboard/tasks", label: "Tasks" },
+  { href: "/dashboard/goals", label: "Goals" },
 ];
 
 export function DashboardNav() {

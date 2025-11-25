@@ -1,5 +1,5 @@
 import { setupServer } from "msw/node";
-import { authHandlers } from "./handlers";
+import { authHandlers, goalHandlers, taskHandlers } from "./handlers";
 
 /**
  * MSW server instance for Node.js environment (tests)
@@ -13,7 +13,11 @@ import { authHandlers } from "./handlers";
  * afterAll(() => server.close());
  * ```
  */
-export const server = setupServer(...authHandlers);
+export const server = setupServer(
+  ...authHandlers,
+  ...goalHandlers,
+  ...taskHandlers,
+);
 
 /**
  * Configure server for test environment

@@ -8,9 +8,14 @@ import type {
 export interface TaskFiltersProps {
   filters: TaskFiltersType;
   onChange: (filters: TaskFiltersType) => void;
+  viewMode?: "list" | "kanban";
 }
 
-export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
+export function TaskFilters({
+  filters,
+  onChange,
+  viewMode = "list",
+}: TaskFiltersProps) {
   const statuses: TaskStatus[] = [
     "created",
     "scheduled",
@@ -63,30 +68,32 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
         }
       />
 
-      {/* Status Filter */}
-      <div>
-        <label className="text-sm font-medium text-text-primary mb-2 block">
-          Status
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {statuses.map((status) => {
-            const isSelected = Array.isArray(filters.status)
-              ? filters.status.includes(status)
-              : filters.status === status;
+      {/* Status Filter - Hidden in Kanban view */}
+      {viewMode === "list" && (
+        <div>
+          <label className="text-sm font-medium text-text-primary mb-2 block">
+            Status
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {statuses.map((status) => {
+              const isSelected = Array.isArray(filters.status)
+                ? filters.status.includes(status)
+                : filters.status === status;
 
-            return (
-              <Badge
-                key={status}
-                variant={isSelected ? "info" : "default"}
-                className="cursor-pointer hover:opacity-80 active:scale-95 transition-all font-semibold"
-                onClick={() => toggleStatus(status)}
-              >
-                {status}
-              </Badge>
-            );
-          })}
+              return (
+                <Badge
+                  key={status}
+                  variant={isSelected ? "info" : "default"}
+                  className="cursor-pointer hover:opacity-80 active:scale-95 transition-all font-semibold"
+                  onClick={() => toggleStatus(status)}
+                >
+                  {status}
+                </Badge>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Priority Filter */}
       <div>

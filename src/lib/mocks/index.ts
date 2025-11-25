@@ -6,11 +6,19 @@
  */
 
 // Mock data
-export { mockUser, mockCredentials, mockUsers } from "./data";
+export {
+  mockUser,
+  mockCredentials,
+  mockUsers,
+  mockGoals,
+  mockTasks,
+} from "./data";
 
 // Mock handlers
 export {
   authHandlers,
+  goalHandlers,
+  taskHandlers,
   resetMockSession,
   setMockUser,
   getMockUser,

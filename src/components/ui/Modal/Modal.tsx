@@ -122,7 +122,9 @@ export function Modal({
               )}
 
               {/* Content */}
-              <div className="p-4 overflow-y-auto flex-1">{children}</div>
+              <div className="p-4 overflow-y-auto no-scrollbar flex-1">
+                {children}
+              </div>
             </motion.div>
           </div>
         </>

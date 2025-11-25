@@ -1,5 +1,5 @@
 import { setupWorker } from "msw/browser";
-import { authHandlers } from "./handlers";
+import { authHandlers, goalHandlers, taskHandlers } from "./handlers";
 
 /**
  * MSW worker instance for browser environment (development)
@@ -7,7 +7,11 @@ import { authHandlers } from "./handlers";
  * This enables API mocking in the browser during development.
  * The service worker intercepts network requests and returns mock responses.
  */
-export const worker = setupWorker(...authHandlers);
+export const worker = setupWorker(
+  ...authHandlers,
+  ...goalHandlers,
+  ...taskHandlers,
+);
 
 /**
  * Start the mock service worker in development mode
