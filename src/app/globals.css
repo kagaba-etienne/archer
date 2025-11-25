@@ -22,7 +22,7 @@
   --text-secondary: #6b7280; /* Gray - supporting text */
   --text-muted: #9ca3af; /* Light gray - disabled text */
 
-  --border-light: #e5e7eb; /* Light borders */
+  --border-light: #f6f6f7; /* Light borders */
   --border-medium: #d1d5db; /* Medium borders */
   --border-dark: #9ca3af; /* Dark borders */
 
@@ -225,9 +225,20 @@ select {
   text-wrap: balance;
 }
 
-.focus-ring:focus {
+.focus-ring:hover {
   outline: none;
   box-shadow:
     0 0 0 2px var(--primary),
     0 0 0 4px rgba(33, 128, 141, 0.1);
+  transition: all var(--transition-base);
+}
+
+/* Shimmer animation for loading skeletons */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
