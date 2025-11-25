@@ -2,19 +2,77 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies:
+
+```bash
+npm install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Development with Mock API
+
+To enable the mock API server in development (useful for frontend development without a backend):
+
+1. Create `.env.local`:
+
+```bash
+NEXT_PUBLIC_ENABLE_MOCKS=true
+```
+
+2. Initialize MSW service worker:
+
+```bash
+npx msw init public/ --save
+```
+
+3. Restart the dev server
+
+See [docs/MOCK_SERVER.md](docs/MOCK_SERVER.md) for full mock API documentation.
+
+## Testing
+
+Run all tests:
+
+```bash
+npm test
+```
+
+Run unit tests only:
+
+```bash
+npm run test:unit
+```
+
+Run tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+Default test credentials:
+
+- Email: `test@archer.app`
+- Password: `testpassword123`
+
+## Project Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript compiler checks
+- `npm test` - Run all tests
+- `npm run test:unit` - Run unit tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run storybook` - Start Storybook component development
+- `npm run build-storybook` - Build Storybook for deployment
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

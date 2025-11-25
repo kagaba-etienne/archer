@@ -156,81 +156,85 @@
   --radius-full: var(--radius-full);
 }
 
-/* Base Styles */
-* {
-  border-color: var(--border-light);
+/* Base Styles - Use @layer base for proper Tailwind specificity */
+@layer base {
+  * {
+    border-color: var(--border-light);
+  }
+
+  body {
+    background: var(--bg-light);
+    color: var(--text-primary);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
+    color: var(--text-primary);
+  }
+
+  h1 {
+    font-size: var(--font-size-4xl);
+  }
+  h2 {
+    font-size: var(--font-size-3xl);
+  }
+  h3 {
+    font-size: var(--font-size-2xl);
+  }
+  h4 {
+    font-size: var(--font-size-xl);
+  }
+  h5 {
+    font-size: var(--font-size-lg);
+  }
+  h6 {
+    font-size: var(--font-size-base);
+  }
+
+  a {
+    color: var(--primary);
+    transition: color var(--transition-fast);
+  }
+
+  a:hover {
+    color: var(--primary-hover);
+  }
+
+  button {
+    font-family: var(--font-family-base);
+  }
+
+  input,
+  textarea,
+  select {
+    font-family: var(--font-family-base);
+  }
 }
 
-body {
-  background: var(--bg-light);
-  color: var(--text-primary);
-  font-family: var(--font-family-base);
-  font-size: var(--font-size-base);
-  line-height: var(--line-height-normal);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* Utility Classes - Use @layer utilities for custom utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: var(--font-weight-semibold);
-  line-height: var(--line-height-tight);
-  color: var(--text-primary);
-}
-
-h1 {
-  font-size: var(--font-size-4xl);
-}
-h2 {
-  font-size: var(--font-size-3xl);
-}
-h3 {
-  font-size: var(--font-size-2xl);
-}
-h4 {
-  font-size: var(--font-size-xl);
-}
-h5 {
-  font-size: var(--font-size-lg);
-}
-h6 {
-  font-size: var(--font-size-base);
-}
-
-a {
-  color: var(--primary);
-  transition: color var(--transition-fast);
-}
-
-a:hover {
-  color: var(--primary-hover);
-}
-
-button {
-  font-family: var(--font-family-base);
-}
-
-input,
-textarea,
-select {
-  font-family: var(--font-family-base);
-}
-
-/* Utility Classes */
-.text-balance {
-  text-wrap: balance;
-}
-
-.focus-ring:hover {
-  outline: none;
-  box-shadow:
-    0 0 0 2px var(--primary),
-    0 0 0 4px rgba(33, 128, 141, 0.1);
-  transition: all var(--transition-base);
+  .focus-ring:hover {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--primary),
+      0 0 0 4px rgba(33, 128, 141, 0.1);
+    transition: all var(--transition-base);
+  }
 }
 
 /* Shimmer animation for loading skeletons */

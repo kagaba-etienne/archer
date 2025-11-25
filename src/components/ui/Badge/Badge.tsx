@@ -17,11 +17,11 @@ export function Badge({
   ...props
 }: BadgeProps) {
   const variants = {
-    default: "bg-bg-gray text-text-primary",
-    success: "bg-accent-success text-white",
-    warning: "bg-accent-warning text-white",
-    error: "bg-accent-error text-white",
-    info: "bg-accent-info text-white",
+    default: "bg-bg-gray text-text-primary border border-border-medium",
+    success: "bg-accent-success text-white border border-accent-success",
+    warning: "bg-accent-warning text-white border border-accent-warning",
+    error: "bg-accent-error text-white border border-accent-error",
+    info: "bg-accent-info text-white border border-accent-info",
   };
 
   const sizes = {
@@ -32,7 +32,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center font-medium rounded-full",
+        "inline-flex items-center font-medium rounded-full transition-all",
         variants[variant],
         sizes[size],
         className,

@@ -78,7 +78,7 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
               <Badge
                 key={status}
                 variant={isSelected ? "info" : "default"}
-                className="cursor-pointer"
+                className="cursor-pointer hover:opacity-80 active:scale-95 transition-all font-semibold"
                 onClick={() => toggleStatus(status)}
               >
                 {status}
@@ -103,7 +103,7 @@ export function TaskFilters({ filters, onChange }: TaskFiltersProps) {
               <Badge
                 key={priority}
                 variant={isSelected ? "warning" : "default"}
-                className="cursor-pointer capitalize"
+                className="cursor-pointer capitalize hover:opacity-80 active:scale-95 transition-all font-semibold"
                 onClick={() => togglePriority(priority)}
               >
                 {priority}

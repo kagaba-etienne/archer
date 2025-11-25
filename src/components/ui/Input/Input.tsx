@@ -59,10 +59,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "bg-bg-white border rounded-lg",
               "text-text-primary placeholder:text-text-muted",
               "transition-all duration-200",
-              "focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary",
+              "focus:outline-none focus:ring-2 focus:ring-primary",
               error
-                ? "border-accent-error focus:ring-accent-error"
-                : "border-border-medium",
+                ? "border-accent-error focus:ring-accent-error focus:border-accent-error"
+                : "border-border-medium focus:border-border-medium",
               disabled && "opacity-50 cursor-not-allowed bg-bg-gray",
               isPasswordType && "pr-10",
               className,

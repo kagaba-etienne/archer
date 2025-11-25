@@ -2,6 +2,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { defineConfig } from "vitest/config";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 
@@ -14,8 +15,27 @@ const dirname =
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
+  plugins: [tsconfigPaths()],
+  resolve: {
+    alias: {
+      "@": path.resolve(dirname, "./src"),
+    },
+  },
   test: {
     projects: [
+      // Unit tests with MSW mocking
+      {
+        plugins: [tsconfigPaths()],
+        test: {
+          name: "unit",
+          environment: "node",
+          globals: true,
+          setupFiles: ["./src/lib/mocks/setup.ts"],
+          include: ["src/**/*.{test,spec}.{ts,tsx}"],
+          exclude: ["src/**/*.stories.{ts,tsx}", "node_modules"],
+        },
+      },
+      // Storybook tests
       {
         extends: true,
         plugins: [

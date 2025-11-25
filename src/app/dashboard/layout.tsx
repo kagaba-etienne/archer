@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/api/auth";
 import { useAuthStore } from "@/stores/authStore";
 import { queryKeys } from "@/services/queryClient";
 import { LoadingSkeleton } from "@/components/ui";
+import { DashboardNav } from "@/components/layout/DashboardNav";
 
 /**
  * Protected layout for dashboard pages
@@ -61,6 +62,11 @@ export default function DashboardLayout({
     return null;
   }
 
-  // User is authenticated, render children
-  return <>{children}</>;
+  // User is authenticated, render children with navigation
+  return (
+    <div className="min-h-screen bg-bg-light">
+      <DashboardNav />
+      <main>{children}</main>
+    </div>
+  );
 }

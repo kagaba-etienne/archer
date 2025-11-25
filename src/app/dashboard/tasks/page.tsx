@@ -26,7 +26,7 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-bg-light">
+    <div className="p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -39,26 +39,30 @@ export default function TasksPage() {
 
           <div className="flex items-center gap-2">
             {/* View Toggle */}
-            <div className="flex border border-border-medium rounded-lg p-1">
+            <div className="flex border border-border-medium rounded-lg">
               <button
-                className={`p-2 rounded ${view === "list" ? "bg-primary text-white" : "text-text-secondary"}`}
+                className={`p-1 rounded-l-lg ${view === "list" ? "bg-primary text-white" : "text-text-secondary"}`}
                 onClick={() => setView("list")}
                 aria-label="List view"
               >
-                <List className="h-4 w-4" />
+                <List className="h-3 w-3" />
               </button>
               <button
-                className={`p-2 rounded ${view === "kanban" ? "bg-primary text-white" : "text-text-secondary"}`}
+                className={`p-1 rounded-r-lg ${view === "kanban" ? "bg-primary text-white" : "text-text-secondary"}`}
                 onClick={() => setView("kanban")}
                 aria-label="Kanban view"
               >
-                <LayoutGrid className="h-4 w-4" />
+                <LayoutGrid className="h-3 w-3" />
               </button>
             </div>
 
-            <Button variant="primary" onClick={() => setIsFormOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              New Task
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsFormOpen(true)}
+            >
+              <Plus className="sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">New Task</span>
             </Button>
           </div>
         </div>
