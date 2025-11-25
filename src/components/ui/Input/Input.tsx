@@ -1,3 +1,5 @@
+"use client";
+
 import { forwardRef, useState, useId } from "react";
 import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -85,9 +87,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
-                <EyeOff className="h-5 w-5" />
+                <EyeOff className="h-3 w-3" />
               ) : (
-                <Eye className="h-5 w-5" />
+                <Eye className="h-3 w-3" />
               )}
             </button>
           )}
@@ -99,7 +101,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className="flex items-center gap-1 text-sm text-accent-error"
             role="alert"
           >
-            <AlertCircle className="h-4 w-4" />
+            <AlertCircle className="h-2 w-2" />
             {error}
           </div>
         )}
