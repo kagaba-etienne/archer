@@ -6,6 +6,7 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
+import pluginQuery from "@tanstack/eslint-plugin-query";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -13,11 +14,18 @@ const eslintConfig = defineConfig([
   prettier,
   {
     plugins: {
+      "@tanstack/query": pluginQuery,
       prettier: prettierPlugin,
       storybook: storybook,
     },
     rules: {
       "prettier/prettier": "warn",
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/no-rest-destructuring": "warn",
+      "@tanstack/query/stable-query-client": "error",
     },
   },
   // Override default ignores of eslint-config-next.
