@@ -83,3 +83,38 @@ export async function deleteTask(id: string): Promise<void> {
 export async function getTaskStats(): Promise<TaskStats> {
   return apiGet<TaskStats>("/tasks/stats");
 }
+
+/**
+ * Start task (transition to in-progress)
+ */
+export async function startTask(id: string): Promise<Task> {
+  return apiPost<Task>(`/tasks/${id}/start`, {});
+}
+
+/**
+ * Complete task
+ */
+export async function completeTask(id: string): Promise<Task> {
+  return apiPost<Task>(`/tasks/${id}/complete`, {});
+}
+
+/**
+ * Block task with reason
+ */
+export async function blockTask(id: string, reason: string): Promise<Task> {
+  return apiPost<Task>(`/tasks/${id}/block`, { reason });
+}
+
+/**
+ * Unblock task
+ */
+export async function unblockTask(id: string): Promise<Task> {
+  return apiPost<Task>(`/tasks/${id}/unblock`, {});
+}
+
+/**
+ * Archive task
+ */
+export async function archiveTask(id: string): Promise<Task> {
+  return apiPost<Task>(`/tasks/${id}/archive`, {});
+}

@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import toast from "react-hot-toast";
+import { toast } from "@/lib/utils/toast";
 import { login } from "@/lib/api/auth";
 import { loginSchema, type LoginFormData } from "@/lib/validations/auth";
 import { Button, Input, Card } from "@/components/ui";

@@ -38,6 +38,7 @@ const eslintConfig = defineConfig([
     // Custom ignores:
     "public/**",
     "storybook-static/**",
+    ".github/**",
   ]),
 ]);
 

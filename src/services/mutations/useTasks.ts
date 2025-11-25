@@ -1,5 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiPost, apiPatch, apiDelete } from "@/lib/api/client";
+import {
+  startTask,
+  completeTask,
+  blockTask,
+  unblockTask,
+  archiveTask,
+} from "@/lib/api/tasks";
 import { queryKeys } from "../queryClient";
 import type { Task, CreateTaskDto, UpdateTaskDto } from "@/types";
 
@@ -132,6 +139,78 @@ export function useDeleteTask() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.insights.alignment });
+    },
+  });
+}
+
+/**
+ * Start task (transition to in-progress)
+ */
+export function useStartTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: startTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    },
+  });
+}
+
+/**
+ * Complete task
+ */
+export function useCompleteTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: completeTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.insights.alignment });
+    },
+  });
+}
+
+/**
+ * Block task with reason
+ */
+export function useBlockTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
+      blockTask(id, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    },
+  });
+}
+
+/**
+ * Unblock task
+ */
+export function useUnblockTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: unblockTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
+    },
+  });
+}
+
+/**
+ * Archive task
+ */
+export function useArchiveTask() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: archiveTask,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tasks.all });
     },
   });
 }
