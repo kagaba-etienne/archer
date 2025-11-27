@@ -49,6 +49,7 @@ export const queryKeys = {
   },
   // Insights
   insights: {
+    all: ["insights"] as const,
     alignment: ["insights", "alignment"] as const,
     recommendations: ["insights", "recommendations"] as const,
     trends: ["insights", "trends"] as const,

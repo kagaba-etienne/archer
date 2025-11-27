@@ -10,6 +10,25 @@ export type RecommendationType =
   | "reflection-prompt";
 
 /**
+ * Recommendation priority
+ */
+export type RecommendationPriority = "high" | "medium" | "low";
+
+/**
+ * Recommendation category
+ */
+export type RecommendationCategory =
+  | "task-prioritization"
+  | "goal-alignment"
+  | "time-management"
+  | "habit-formation";
+
+/**
+ * Recommendation status
+ */
+export type RecommendationStatus = "pending" | "accepted" | "dismissed";
+
+/**
  * Recommendation entity from UML class diagram
  */
 export interface Recommendation {
@@ -24,6 +43,14 @@ export interface Recommendation {
   dismissed: boolean;
   appliedAt?: Date;
   createdAt: Date;
+  // Additional fields for Phase 9
+  title: string;
+  description: string;
+  priority: RecommendationPriority;
+  category: RecommendationCategory;
+  status: RecommendationStatus;
+  confidence?: number; // 0-1 for display
+  reasoning?: string; // Detailed explanation
 }
 
 /**
@@ -35,11 +62,18 @@ export interface ApplyRecommendationDto {
 }
 
 /**
+ * Accept recommendation DTO
+ */
+export interface AcceptRecommendationDto {
+  recommendationId: string;
+}
+
+/**
  * Dismiss recommendation request
  */
 export interface DismissRecommendationDto {
   recommendationId: string;
-  reason?: string;
+  reason?: "not-relevant" | "already-done" | "not-now" | "other";
 }
 
 /**

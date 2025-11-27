@@ -1,41 +1,52 @@
-import { apiGet } from "./client";
-import type { AlignmentScore, Recommendation } from "@/types";
+import { apiGet, apiPost } from "./client";
+import type {
+  AlignmentScore,
+  Recommendation,
+  InsightsTrend,
+  AcceptRecommendationDto,
+  DismissRecommendationDto,
+} from "@/types";
 
 /**
- * Fetch alignment score and insights
- * To be implemented in Phase 6
+ * Get current alignment score
  */
-export async function getAlignmentScore(): Promise<AlignmentScore> {
+export async function getAlignmentScore() {
   return apiGet<AlignmentScore>("/insights/alignment");
 }
 
 /**
- * Fetch AI recommendations
+ * Get AI recommendations
  */
-export async function getRecommendations(): Promise<{
-  recommendations: Recommendation[];
-}> {
+export async function getRecommendations() {
   return apiGet<{ recommendations: Recommendation[] }>(
     "/insights/recommendations",
   );
 }
 
 /**
- * Fetch productivity trends
+ * Get insights trends over time
  */
-export async function getTrends(params?: {
-  period?: string;
-}): Promise<unknown> {
-  const queryParams = new URLSearchParams();
+export async function getInsightsTrends(days: number = 30) {
+  return apiGet<InsightsTrend>(`/insights/trends?days=${days}`);
+}
 
-  if (params?.period) {
-    queryParams.append("period", params.period);
-  }
+/**
+ * Accept a recommendation
+ */
+export async function acceptRecommendation(data: AcceptRecommendationDto) {
+  return apiPost<void>("/insights/recommendations/accept", data);
+}
 
-  const queryString = queryParams.toString();
-  const endpoint = queryString
-    ? `/insights/trends?${queryString}`
-    : "/insights/trends";
+/**
+ * Dismiss a recommendation
+ */
+export async function dismissRecommendation(data: DismissRecommendationDto) {
+  return apiPost<void>("/insights/recommendations/dismiss", data);
+}
 
-  return apiGet<unknown>(endpoint);
+/**
+ * Refresh AI insights (trigger re-analysis)
+ */
+export async function refreshInsights() {
+  return apiPost<void>("/insights/refresh", {});
 }

@@ -11,6 +11,12 @@ export interface AlignmentScore {
   tasksAligned: number;
   tasksUnaligned: number;
   calculatedAt: Date;
+  changeFromLastWeek?: number; // percentage change
+  breakdown: {
+    taskCompletion: number;
+    goalProgress: number;
+    consistency: number;
+  };
 }
 
 /**
@@ -81,4 +87,14 @@ export interface TaskRanking {
   score: number;
   suggestedPriority: TaskPriority;
   reasoning: string;
+}
+
+/**
+ * Insights trend over time
+ */
+export interface InsightsTrend {
+  alignmentHistory: AlignmentHistoryPoint[];
+  averageScore: number;
+  peakScore: number;
+  currentScore: number;
 }

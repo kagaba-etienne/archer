@@ -1,16 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api/client";
+import {
+  getAlignmentScore,
+  getRecommendations,
+  getInsightsTrends,
+} from "@/lib/api/insights";
 import { queryKeys } from "../queryClient";
-import type { AlignmentScore, Recommendation } from "@/types";
 
 /**
- * Fetch alignment score and insights
- * To be implemented in Phase 6
+ * Fetch current alignment score
  */
-export function useAlignmentQuery() {
+export function useAlignmentScoreQuery() {
   return useQuery({
     queryKey: queryKeys.insights.alignment,
-    queryFn: () => apiGet<AlignmentScore>("/insights/alignment"),
+    queryFn: getAlignmentScore,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
@@ -20,31 +23,19 @@ export function useAlignmentQuery() {
 export function useRecommendationsQuery() {
   return useQuery({
     queryKey: queryKeys.insights.recommendations,
-    queryFn: async () => {
-      return apiGet<{ recommendations: Recommendation[] }>(
-        "/insights/recommendations",
-      );
-    },
+    queryFn: () => getRecommendations(),
     select: (data) => data.recommendations,
+    staleTime: 1000 * 60 * 10, // 10 minutes
   });
 }
 
 /**
- * Fetch productivity trends
+ * Fetch insights trends
  */
-export function useTrendsQuery(period?: string) {
+export function useInsightsTrendsQuery(days: number = 30) {
   return useQuery({
-    queryKey: ["insights", "trends", period],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (period) {
-        params.append("period", period);
-      }
-      const queryString = params.toString();
-      const endpoint = queryString
-        ? `/insights/trends?${queryString}`
-        : "/insights/trends";
-      return apiGet<unknown>(endpoint);
-    },
+    queryKey: [...queryKeys.insights.trends, days],
+    queryFn: () => getInsightsTrends(days),
+    staleTime: 1000 * 60 * 15, // 15 minutes
   });
 }
