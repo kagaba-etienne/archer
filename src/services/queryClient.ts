@@ -44,8 +44,7 @@ export const queryKeys = {
   // Reflections
   reflections: {
     all: ["reflections"] as const,
-    list: (filters?: Record<string, unknown>) =>
-      ["reflections", "list", filters] as const,
+    list: (filters?: unknown) => ["reflections", "list", filters] as const,
     detail: (id: string) => ["reflections", "detail", id] as const,
   },
   // Insights

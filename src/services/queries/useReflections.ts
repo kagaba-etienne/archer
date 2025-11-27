@@ -1,33 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api/client";
+import { getReflections, getReflection } from "@/lib/api/reflections";
 import { queryKeys } from "../queryClient";
-import type { Reflection } from "@/types";
+import type { ReflectionFilters } from "@/types";
 
 /**
  * Fetch all reflections with optional filters
- * To be implemented in Phase 6
  */
-export function useReflectionsQuery(filters?: Record<string, unknown>) {
+export function useReflectionsQuery(filters?: ReflectionFilters) {
   return useQuery({
     queryKey: queryKeys.reflections.list(filters),
-    queryFn: async () => {
-      const params = new URLSearchParams();
-
-      if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null) {
-            params.append(key, String(value));
-          }
-        });
-      }
-
-      const queryString = params.toString();
-      const endpoint = queryString
-        ? `/reflections?${queryString}`
-        : "/reflections";
-
-      return apiGet<{ reflections: Reflection[] }>(endpoint);
-    },
+    queryFn: () => getReflections(filters),
     select: (data) => data.reflections,
   });
 }
@@ -38,7 +20,7 @@ export function useReflectionsQuery(filters?: Record<string, unknown>) {
 export function useReflectionQuery(id: string) {
   return useQuery({
     queryKey: queryKeys.reflections.detail(id),
-    queryFn: () => apiGet<Reflection>(`/reflections/${id}`),
+    queryFn: () => getReflection(id),
     enabled: !!id,
   });
 }

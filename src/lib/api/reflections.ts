@@ -3,23 +3,33 @@ import type {
   Reflection,
   CreateReflectionDto,
   UpdateReflectionDto,
+  ReflectionFilters,
+  AnalyzeSentimentDto,
+  SentimentAnalysisResult,
 } from "@/types";
 
 /**
  * Fetch all reflections with optional filters
- * To be implemented in Phase 6
  */
 export async function getReflections(
-  filters?: Record<string, unknown>,
+  filters?: ReflectionFilters,
 ): Promise<{ reflections: Reflection[] }> {
   const params = new URLSearchParams();
 
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        params.append(key, String(value));
-      }
-    });
+  if (filters?.sentiment) {
+    params.append("sentiment", filters.sentiment);
+  }
+  if (filters?.tags) {
+    filters.tags.forEach((tag) => params.append("tags", tag));
+  }
+  if (filters?.startDate) {
+    params.append("startDate", filters.startDate.toISOString());
+  }
+  if (filters?.endDate) {
+    params.append("endDate", filters.endDate.toISOString());
+  }
+  if (filters?.search) {
+    params.append("search", filters.search);
   }
 
   const queryString = params.toString();
@@ -59,4 +69,16 @@ export async function updateReflection(
  */
 export async function deleteReflection(id: string): Promise<void> {
   return apiDelete<void>(`/reflections/${id}`);
+}
+
+/**
+ * Analyze sentiment of text
+ */
+export async function analyzeSentiment(
+  data: AnalyzeSentimentDto,
+): Promise<SentimentAnalysisResult> {
+  return apiPost<SentimentAnalysisResult>(
+    "/reflections/analyze-sentiment",
+    data,
+  );
 }
