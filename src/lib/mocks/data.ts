@@ -1,4 +1,10 @@
-import type { User, Goal, Task } from "@/types";
+import type {
+  User,
+  Goal,
+  Task,
+  Notification,
+  NotificationPreferences,
+} from "@/types";
 
 /**
  * Mock test user data
@@ -194,3 +200,78 @@ export const mockTasks: Task[] = [
     updatedAt: new Date("2024-11-23T09:20:00Z"),
   },
 ];
+
+/**
+ * Mock notifications data
+ */
+export const mockNotifications: Notification[] = [
+  {
+    id: "notif-1",
+    userId: "test-user-123",
+    type: "task-reminder",
+    title: "Task Due Soon",
+    message: "Complete React assignment is due in 2 days",
+    channel: "in-app",
+    read: false,
+    actionUrl: "/dashboard/tasks/task-1",
+    createdAt: new Date("2024-11-25T10:00:00Z").toISOString(),
+  },
+  {
+    id: "notif-2",
+    userId: "test-user-123",
+    type: "goal-milestone",
+    title: "Goal Milestone Reached",
+    message: "You've reached 65% progress on Graduate with Honors!",
+    channel: "in-app",
+    read: false,
+    actionUrl: "/dashboard/goals/goal-1",
+    createdAt: new Date("2024-11-24T14:30:00Z").toISOString(),
+  },
+  {
+    id: "notif-3",
+    userId: "test-user-123",
+    type: "ai-insight",
+    title: "AI Recommendation",
+    message:
+      "Based on your pattern, consider scheduling tasks in the morning for better productivity",
+    channel: "in-app",
+    read: true,
+    actionUrl: "/dashboard/insights",
+    createdAt: new Date("2024-11-23T09:15:00Z").toISOString(),
+    readAt: new Date("2024-11-23T10:00:00Z").toISOString(),
+  },
+  {
+    id: "notif-4",
+    userId: "test-user-123",
+    type: "system",
+    title: "Welcome to Archer",
+    message: "Get started by creating your first goal and linking tasks to it",
+    channel: "in-app",
+    read: true,
+    actionUrl: "/dashboard/goals",
+    createdAt: new Date("2024-11-20T08:00:00Z").toISOString(),
+    readAt: new Date("2024-11-20T08:30:00Z").toISOString(),
+  },
+  {
+    id: "notif-5",
+    userId: "test-user-123",
+    type: "task-reminder",
+    title: "Task Blocked",
+    message: "Prepare for midterm exam is blocked. Review and update status.",
+    channel: "in-app",
+    read: false,
+    actionUrl: "/dashboard/tasks/task-4",
+    createdAt: new Date("2024-11-24T16:45:00Z").toISOString(),
+  },
+];
+
+/**
+ * Mock notification preferences
+ */
+export const mockNotificationPreferences: NotificationPreferences = {
+  taskReminders: true,
+  goalMilestones: true,
+  aiInsights: true,
+  weeklySummary: false,
+  systemUpdates: true,
+};

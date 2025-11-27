@@ -57,7 +57,9 @@ export const queryKeys = {
   // Notifications
   notifications: {
     all: ["notifications"] as const,
-    unread: ["notifications", "unread"] as const,
+    list: (filters?: unknown) => ["notifications", "list", filters] as const,
+    unreadCount: ["notifications", "unreadCount"] as const,
+    preferences: ["notifications", "preferences"] as const,
   },
   // Calendar
   calendar: {

@@ -1,33 +1,42 @@
 import { useQuery } from "@tanstack/react-query";
-import { apiGet } from "@/lib/api/client";
+import {
+  getNotifications,
+  getUnreadCount,
+  getNotificationPreferences,
+} from "@/lib/api/notifications";
 import { queryKeys } from "../queryClient";
-import type { Notification } from "@/types";
+import type { NotificationFilters } from "@/types";
 
 /**
  * Fetch all notifications
- * To be implemented in Phase 6
  */
-export function useNotificationsQuery() {
+export function useNotificationsQuery(filters?: NotificationFilters) {
   return useQuery({
-    queryKey: queryKeys.notifications.all,
-    queryFn: async () => {
-      return apiGet<{ notifications: Notification[] }>("/notifications");
-    },
+    queryKey: queryKeys.notifications.list(filters),
+    queryFn: () => getNotifications(filters),
     select: (data) => data.notifications,
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 }
 
 /**
- * Fetch unread notifications
+ * Fetch unread count
  */
-export function useUnreadNotificationsQuery() {
+export function useUnreadCountQuery() {
   return useQuery({
-    queryKey: queryKeys.notifications.unread,
-    queryFn: async () => {
-      return apiGet<{ notifications: Notification[] }>(
-        "/notifications?unread=true",
-      );
-    },
-    select: (data) => data.notifications,
+    queryKey: queryKeys.notifications.unreadCount,
+    queryFn: () => getUnreadCount(),
+    select: (data) => data.count,
+    refetchInterval: 15000, // Refetch every 15 seconds
+  });
+}
+
+/**
+ * Fetch notification preferences
+ */
+export function useNotificationPreferencesQuery() {
+  return useQuery({
+    queryKey: queryKeys.notifications.preferences,
+    queryFn: getNotificationPreferences,
   });
 }

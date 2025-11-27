@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { logout } from "@/lib/api/auth";
 import { Button } from "@/components/ui";
 import { useAuthStore } from "@/stores/authStore";
+import { NotificationBell } from "@/components/features/notifications";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -15,6 +16,7 @@ const navItems = [
   { href: "/dashboard/goals", label: "Goals" },
   { href: "/dashboard/reflections", label: "Reflections" },
   { href: "/dashboard/insights", label: "Insights" },
+  { href: "/dashboard/settings/notifications", label: "Settings" },
 ];
 
 export function DashboardNav() {
@@ -52,7 +54,12 @@ export function DashboardNav() {
           {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive =
+                item.href === "/dashboard"
+                  ? pathname === item.href
+                  : pathname.startsWith(
+                      item.href.split("/").slice(0, 3).join("/"),
+                    );
               return (
                 <Link
                   key={item.href}
@@ -71,6 +78,7 @@ export function DashboardNav() {
 
           {/* Desktop User & Logout */}
           <div className="hidden md:flex items-center space-x-4">
+            <NotificationBell />
             <span className="text-sm text-text-secondary">{user?.name}</span>
             <Button
               variant="outline"
@@ -134,7 +142,12 @@ export function DashboardNav() {
         <div className="md:hidden border-t border-border-light">
           <div className="px-2 pt-2 pb-3 space-y-1">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive =
+                item.href === "/dashboard"
+                  ? pathname === item.href
+                  : pathname.startsWith(
+                      item.href.split("/").slice(0, 3).join("/"),
+                    );
               return (
                 <Link
                   key={item.href}
@@ -153,7 +166,12 @@ export function DashboardNav() {
           </div>
           <div className="pt-4 pb-3 border-t border-border-light">
             <div className="px-4 flex items-center justify-between">
-              <span className="text-sm text-text-secondary">{user?.name}</span>
+              <div className="flex items-center gap-3">
+                <NotificationBell />
+                <span className="text-sm text-text-secondary">
+                  {user?.name}
+                </span>
+              </div>
               <Button
                 variant="outline"
                 size="sm"

@@ -2,12 +2,10 @@
  * Notification type
  */
 export type NotificationType =
-  | "task-due-soon"
-  | "task-overdue"
+  | "task-reminder"
   | "goal-milestone"
-  | "ai-recommendation"
-  | "reflection-reminder"
-  | "system-update";
+  | "ai-insight"
+  | "system";
 
 /**
  * Notification channel
@@ -27,8 +25,8 @@ export interface Notification {
   read: boolean;
   actionUrl?: string;
   metadata?: Record<string, unknown>;
-  sentAt: Date;
-  readAt?: Date;
+  createdAt: string;
+  readAt?: string;
 }
 
 /**
@@ -42,12 +40,17 @@ export interface MarkNotificationReadDto {
  * Notification preferences
  */
 export interface NotificationPreferences {
-  inAppEnabled: boolean;
-  emailEnabled: boolean;
-  pushEnabled: boolean;
-  taskDueSoonHours: number; // hours before due date
-  reflectionReminderTime?: string; // HH:MM format
-  types: {
-    [key in NotificationType]: boolean;
-  };
+  taskReminders: boolean;
+  goalMilestones: boolean;
+  aiInsights: boolean;
+  weeklySummary: boolean;
+  systemUpdates: boolean;
+}
+
+/**
+ * Notification filters
+ */
+export interface NotificationFilters {
+  read?: boolean;
+  type?: NotificationType[];
 }

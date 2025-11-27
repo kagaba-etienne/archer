@@ -1,41 +1,74 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiPatch, apiPost } from "@/lib/api/client";
+import {
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+  updateNotificationPreferences,
+} from "@/lib/api/notifications";
 import { queryKeys } from "../queryClient";
-import type { Notification } from "@/types";
 
 /**
  * Mark notification as read
- * To be implemented in Phase 6
  */
-export function useMarkNotificationAsRead() {
+export function useMarkAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) =>
-      apiPatch<Notification>(`/notifications/${id}`, { read: true }),
-
+    mutationFn: markAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.notifications.unread,
+        queryKey: queryKeys.notifications.unreadCount,
       });
     },
   });
 }
 
 /**
- * Mark all notifications as read
+ * Mark all as read
  */
-export function useMarkAllNotificationsAsRead() {
+export function useMarkAllAsRead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => apiPost<void>("/notifications/mark-all-read"),
-
+    mutationFn: markAllAsRead,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
       queryClient.invalidateQueries({
-        queryKey: queryKeys.notifications.unread,
+        queryKey: queryKeys.notifications.unreadCount,
+      });
+    },
+  });
+}
+
+/**
+ * Delete notification
+ */
+export function useDeleteNotification() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteNotification,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications.unreadCount,
+      });
+    },
+  });
+}
+
+/**
+ * Update preferences
+ */
+export function useUpdateNotificationPreferences() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateNotificationPreferences,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.notifications.preferences,
       });
     },
   });

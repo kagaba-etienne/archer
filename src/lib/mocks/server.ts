@@ -1,5 +1,10 @@
 import { setupServer } from "msw/node";
-import { authHandlers, goalHandlers, taskHandlers } from "./handlers";
+import {
+  authHandlers,
+  goalHandlers,
+  taskHandlers,
+  notificationHandlers,
+} from "./handlers";
 
 /**
  * MSW server instance for Node.js environment (tests)
@@ -17,6 +22,7 @@ export const server = setupServer(
   ...authHandlers,
   ...goalHandlers,
   ...taskHandlers,
+  ...notificationHandlers,
 );
 
 /**

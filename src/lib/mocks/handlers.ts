@@ -10,8 +10,17 @@ import type {
   Task,
   CreateTaskDto,
   UpdateTaskDto,
+  Notification,
+  NotificationPreferences,
 } from "@/types";
-import { mockUser, mockCredentials, mockGoals, mockTasks } from "./data";
+import {
+  mockUser,
+  mockCredentials,
+  mockGoals,
+  mockTasks,
+  mockNotifications,
+  mockNotificationPreferences,
+} from "./data";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
@@ -31,6 +40,18 @@ let goals: Goal[] = [...mockGoals];
  * Simulated tasks storage
  */
 let tasks: Task[] = [...mockTasks];
+
+/**
+ * Simulated notifications storage
+ */
+let notifications: Notification[] = [...mockNotifications];
+
+/**
+ * Simulated notification preferences storage
+ */
+let notificationPreferences: NotificationPreferences = {
+  ...mockNotificationPreferences,
+};
 
 /**
  * MSW handlers for authentication endpoints
@@ -650,12 +671,232 @@ export const taskHandlers = [
 ];
 
 /**
+ * MSW handlers for notification endpoints
+ */
+export const notificationHandlers = [
+  /**
+   * GET /notifications
+   * Fetch all notifications with optional filters
+   */
+  http.get(`${API_BASE_URL}/notifications`, async ({ request }) => {
+    await delay(300);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const url = new URL(request.url);
+    const readParam = url.searchParams.get("read");
+    const typeParams = url.searchParams.getAll("type");
+
+    let filteredNotifications = notifications.filter(
+      (n) => n.userId === currentUser!.id,
+    );
+
+    // Filter by read status
+    if (readParam !== null) {
+      const isRead = readParam === "true";
+      filteredNotifications = filteredNotifications.filter(
+        (n) => n.read === isRead,
+      );
+    }
+
+    // Filter by type
+    if (typeParams.length > 0) {
+      filteredNotifications = filteredNotifications.filter((n) =>
+        typeParams.includes(n.type),
+      );
+    }
+
+    // Sort by creation date (newest first)
+    filteredNotifications.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+
+    return HttpResponse.json(
+      { notifications: filteredNotifications },
+      { status: 200 },
+    );
+  }),
+
+  /**
+   * GET /notifications/unread-count
+   * Get count of unread notifications
+   */
+  http.get(`${API_BASE_URL}/notifications/unread-count`, async () => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const count = notifications.filter(
+      (n) => n.userId === currentUser!.id && !n.read,
+    ).length;
+
+    return HttpResponse.json({ count }, { status: 200 });
+  }),
+
+  /**
+   * PATCH /notifications/:id/read
+   * Mark notification as read
+   */
+  http.patch(`${API_BASE_URL}/notifications/:id/read`, async ({ params }) => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const { id } = params;
+    const notification = notifications.find((n) => n.id === id);
+
+    if (!notification) {
+      return HttpResponse.json(
+        { message: "Notification not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    if (notification.userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Unauthorized", code: "FORBIDDEN" },
+        { status: 403 },
+      );
+    }
+
+    notification.read = true;
+    notification.readAt = new Date().toISOString();
+
+    return HttpResponse.json(notification, { status: 200 });
+  }),
+
+  /**
+   * POST /notifications/mark-all-read
+   * Mark all notifications as read
+   */
+  http.post(`${API_BASE_URL}/notifications/mark-all-read`, async () => {
+    await delay(300);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const now = new Date().toISOString();
+    notifications.forEach((n) => {
+      if (n.userId === currentUser!.id && !n.read) {
+        n.read = true;
+        n.readAt = now;
+      }
+    });
+
+    return HttpResponse.json({ success: true }, { status: 200 });
+  }),
+
+  /**
+   * POST /notifications/:id/delete
+   * Delete notification
+   */
+  http.post(`${API_BASE_URL}/notifications/:id/delete`, async ({ params }) => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    const { id } = params;
+    const index = notifications.findIndex((n) => n.id === id);
+
+    if (index === -1) {
+      return HttpResponse.json(
+        { message: "Notification not found", code: "NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    if (notifications[index].userId !== currentUser.id) {
+      return HttpResponse.json(
+        { message: "Unauthorized", code: "FORBIDDEN" },
+        { status: 403 },
+      );
+    }
+
+    notifications.splice(index, 1);
+
+    return HttpResponse.json({ success: true }, { status: 200 });
+  }),
+
+  /**
+   * GET /notifications/preferences
+   * Get notification preferences
+   */
+  http.get(`${API_BASE_URL}/notifications/preferences`, async () => {
+    await delay(200);
+
+    if (!currentUser) {
+      return HttpResponse.json(
+        { message: "Authentication required", code: "UNAUTHORIZED" },
+        { status: 401 },
+      );
+    }
+
+    return HttpResponse.json(notificationPreferences, { status: 200 });
+  }),
+
+  /**
+   * PATCH /notifications/preferences
+   * Update notification preferences
+   */
+  http.patch(
+    `${API_BASE_URL}/notifications/preferences`,
+    async ({ request }) => {
+      await delay(300);
+
+      if (!currentUser) {
+        return HttpResponse.json(
+          { message: "Authentication required", code: "UNAUTHORIZED" },
+          { status: 401 },
+        );
+      }
+
+      const updates =
+        (await request.json()) as Partial<NotificationPreferences>;
+
+      notificationPreferences = {
+        ...notificationPreferences,
+        ...updates,
+      };
+
+      return HttpResponse.json(notificationPreferences, { status: 200 });
+    },
+  ),
+];
+
+/**
  * Helper function to reset mock session (useful for tests)
  */
 export function resetMockSession(): void {
   currentUser = null;
   goals = [...mockGoals];
   tasks = [...mockTasks];
+  notifications = [...mockNotifications];
+  notificationPreferences = { ...mockNotificationPreferences };
 }
 
 /**

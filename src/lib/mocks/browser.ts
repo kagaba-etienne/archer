@@ -1,5 +1,10 @@
 import { setupWorker } from "msw/browser";
-import { authHandlers, goalHandlers, taskHandlers } from "./handlers";
+import {
+  authHandlers,
+  goalHandlers,
+  taskHandlers,
+  notificationHandlers,
+} from "./handlers";
 
 /**
  * MSW worker instance for browser environment (development)
@@ -11,6 +16,7 @@ export const worker = setupWorker(
   ...authHandlers,
   ...goalHandlers,
   ...taskHandlers,
+  ...notificationHandlers,
 );
 
 /**

@@ -12,6 +12,8 @@ export {
   mockUsers,
   mockGoals,
   mockTasks,
+  mockNotifications,
+  mockNotificationPreferences,
 } from "./data";
 
 // Mock handlers
@@ -19,6 +21,7 @@ export {
   authHandlers,
   goalHandlers,
   taskHandlers,
+  notificationHandlers,
   resetMockSession,
   setMockUser,
   getMockUser,
