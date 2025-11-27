@@ -16,7 +16,7 @@ const navItems = [
   { href: "/dashboard/goals", label: "Goals" },
   { href: "/dashboard/reflections", label: "Reflections" },
   { href: "/dashboard/insights", label: "Insights" },
-  { href: "/dashboard/settings/notifications", label: "Settings" },
+  { href: "/dashboard/settings", label: "Settings" },
 ];
 
 export function DashboardNav() {

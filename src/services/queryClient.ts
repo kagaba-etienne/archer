@@ -63,6 +63,9 @@ export const queryKeys = {
   },
   // Calendar
   calendar: {
+    all: ["calendar"] as const,
+    accounts: ["calendar", "accounts"] as const,
+    events: ["calendar", "events"] as const,
     integrations: ["calendar", "integrations"] as const,
     sync: (integrationId: string) =>
       ["calendar", "sync", integrationId] as const,

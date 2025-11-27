@@ -26,6 +26,45 @@ export interface CalendarIntegration {
 }
 
 /**
+ * Calendar account
+ */
+export interface CalendarAccount {
+  id: string;
+  provider: CalendarProvider;
+  email: string;
+  calendars?: Calendar[];
+  lastSyncAt?: Date;
+  createdAt: Date;
+}
+
+/**
+ * Individual calendar
+ */
+export interface Calendar {
+  id: string;
+  name: string;
+  color?: string;
+  isPrimary: boolean;
+}
+
+/**
+ * Calendar event
+ */
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  startTime: Date;
+  endTime: Date;
+  allDay?: boolean;
+  calendarId: string;
+  calendarName?: string;
+  calendarColor?: string;
+  eventUrl?: string;
+  location?: string;
+}
+
+/**
  * Connect calendar request
  */
 export interface ConnectCalendarDto {
