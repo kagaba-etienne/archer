@@ -22,17 +22,41 @@ export default defineConfig({
     },
   },
   test: {
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html", "lcov"],
+      exclude: [
+        "node_modules/",
+        "src/tests/",
+        "**/*.config.ts",
+        "**/*.config.mjs",
+        "**/dist/**",
+        "**/*.stories.{ts,tsx}",
+        ".storybook/**",
+        "storybook-static/**",
+        "src/lib/mocks/**",
+        "src/types/**",
+        "**/*.d.ts",
+        "e2e/**",
+      ],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80,
+      },
+    },
     projects: [
-      // Unit tests with MSW mocking
+      // Unit tests with MSW mocking and coverage
       {
         plugins: [tsconfigPaths()],
         test: {
           name: "unit",
-          environment: "node",
+          environment: "jsdom",
           globals: true,
-          setupFiles: ["./src/lib/mocks/setup.ts"],
+          setupFiles: ["./src/tests/setup.ts"],
           include: ["src/**/*.{test,spec}.{ts,tsx}"],
-          exclude: ["src/**/*.stories.{ts,tsx}", "node_modules"],
+          exclude: ["src/**/*.stories.{ts,tsx}", "node_modules", "e2e/**"],
         },
       },
       // Storybook tests
