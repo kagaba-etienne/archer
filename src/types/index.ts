@@ -22,6 +22,9 @@ export * from "./calendar.types";
 // Insights types
 export * from "./insights.types";
 
+// Navigation types
+export * from "./navigation.types";
+
 // API types
 export * from "./api.types";
 
