@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
+import { VoiceAssistant } from "@/components/features/voice/VoiceAssistant";
 
 export interface MainLayoutProps {
   children: React.ReactNode;
@@ -39,6 +40,9 @@ export function MainLayout({ children }: MainLayoutProps) {
         {/* Content Area */}
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
+
+      {/* Voice Assistant */}
+      <VoiceAssistant />
     </div>
   );
 }
