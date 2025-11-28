@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Target, Calendar, MoreVertical, Trash2, Edit } from "lucide-react";
-import { format } from "date-fns";
+import { Target, MoreVertical, Trash2, Edit } from "lucide-react";
 import { Card, Badge, Button } from "@/components/ui";
 import { GoalProgressRing } from "./GoalProgressRing";
 import type { Goal } from "@/types";
@@ -23,9 +22,9 @@ export function GoalCard({
   const [showMenu, setShowMenu] = useState(false);
 
   const horizonColors = {
-    "short-term": "info",
-    "mid-term": "warning",
-    "long-term": "success",
+    SHORT_TERM: "info",
+    MID_TERM: "warning",
+    LONG_TERM: "success",
   } as const;
 
   return (
@@ -64,16 +63,6 @@ export function GoalCard({
               {goal.horizon}
             </Badge>
           </div>
-
-          {goal.targetDate && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-text-secondary">Target Date</span>
-              <div className="flex items-center gap-1 text-sm">
-                <Calendar className="h-4 w-4" />
-                <span>{format(new Date(goal.targetDate), "MMM dd, yyyy")}</span>
-              </div>
-            </div>
-          )}
 
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-secondary">Linked Tasks</span>

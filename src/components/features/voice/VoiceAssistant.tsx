@@ -25,13 +25,13 @@ export function VoiceAssistant() {
         createTask.mutate({
           title: parameters.title as string,
           description: parameters.title as string,
-          priority: "medium",
+          priority: "MEDIUM",
         });
         break;
       case "create-goal":
         createGoal.mutate({
           title: parameters.title as string,
-          horizon: "mid-term",
+          horizon: "MID_TERM",
         });
         break;
       case "view-tasks":

@@ -6,14 +6,14 @@ import type { Reflection, Sentiment } from "./reflection.types";
  * Type guard: Check if task is completed
  */
 export function isTaskCompleted(task: Task): boolean {
-  return task.status === "completed";
+  return task.status === "COMPLETED";
 }
 
 /**
  * Type guard: Check if task is blocked
  */
 export function isTaskBlocked(task: Task): boolean {
-  return task.status === "blocked";
+  return task.status === "BLOCKED";
 }
 
 /**
@@ -21,7 +21,7 @@ export function isTaskBlocked(task: Task): boolean {
  */
 export function isTaskOverdue(task: Task): boolean {
   if (!task.dueDate) return false;
-  return new Date(task.dueDate) < new Date() && task.status !== "completed";
+  return new Date(task.dueDate) < new Date() && task.status !== "COMPLETED";
 }
 
 /**
@@ -54,12 +54,12 @@ export function hasSentiment(
  */
 export function getTaskStatusColor(status: TaskStatus): string {
   const colors: Record<TaskStatus, string> = {
-    created: "bg-gray",
-    scheduled: "primary",
-    "in-progress": "accent-info",
-    blocked: "accent-error",
-    completed: "accent-success",
-    archived: "text-muted",
+    CREATED: "bg-gray",
+    SCHEDULED: "primary",
+    IN_PROGRESS: "accent-info",
+    BLOCKED: "accent-error",
+    COMPLETED: "accent-success",
+    CANCELLED: "text-muted",
   };
   return colors[status];
 }

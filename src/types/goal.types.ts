@@ -1,7 +1,7 @@
 /**
- * Goal horizon/timeframe
+ * Goal horizon/timeframe (matches Prisma enum)
  */
-export type GoalHorizon = "short-term" | "mid-term" | "long-term";
+export type GoalHorizon = "SHORT_TERM" | "MID_TERM" | "LONG_TERM";
 
 /**
  * Goal entity from UML class diagram
@@ -12,7 +12,6 @@ export interface Goal {
   title: string;
   description?: string;
   horizon: GoalHorizon;
-  targetDate?: Date;
   progress: number; // 0-100
   taskIds: string[];
   createdAt: Date;
@@ -26,7 +25,6 @@ export interface CreateGoalDto {
   title: string;
   description?: string;
   horizon: GoalHorizon;
-  targetDate?: Date;
 }
 
 /**
@@ -36,7 +34,6 @@ export interface UpdateGoalDto {
   title?: string;
   description?: string;
   horizon?: GoalHorizon;
-  targetDate?: Date;
 }
 
 /**

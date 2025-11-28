@@ -88,6 +88,7 @@ export function Modal({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               transition={{ duration: 0.2 }}
+              onClick={(e) => e.stopPropagation()}
               className={cn(
                 "bg-bg-white rounded-lg shadow-lg w-full",
                 "max-h-[90vh] overflow-hidden flex flex-col",

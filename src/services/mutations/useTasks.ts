@@ -41,7 +41,7 @@ export function useCreateTask() {
                   ...newTask,
                   id: "temp-" + Date.now(),
                   userId: "current-user",
-                  status: "created",
+                  status: "CREATED",
                   goalIds: newTask.goalIds || [],
                   createdAt: new Date(),
                   updatedAt: new Date(),
@@ -112,7 +112,16 @@ export function useUpdateTask() {
                 return {
                   tasks: old.tasks.map((task) =>
                     task.id === id
-                      ? { ...task, ...data, updatedAt: new Date() }
+                      ? {
+                          ...task,
+                          ...data,
+                          dueDate: data.dueDate
+                            ? typeof data.dueDate === "string"
+                              ? new Date(data.dueDate)
+                              : data.dueDate
+                            : task.dueDate,
+                          updatedAt: new Date(),
+                        }
                       : task,
                   ),
                 };

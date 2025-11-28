@@ -25,7 +25,8 @@ export async function getGoal(id: string) {
  * Create new goal
  */
 export async function createGoal(data: CreateGoalDto) {
-  return apiPost<Goal>("/goals", data);
+  const result = await apiPost<Goal>("/goals", data);
+  return result;
 }
 
 /**

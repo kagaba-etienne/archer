@@ -9,8 +9,8 @@ const mockTask: Task = {
   userId: "user1",
   title: "Test Task",
   description: "Test Description",
-  status: "in-progress",
-  priority: "high",
+  status: "IN_PROGRESS",
+  priority: "HIGH",
   dueDate: new Date("2024-12-31"),
   createdAt: new Date(),
   updatedAt: new Date(),
@@ -36,12 +36,12 @@ describe("TaskCard Component", () => {
 
     it("should render task status badge", () => {
       render(<TaskCard task={mockTask} />);
-      expect(screen.getByText("in-progress")).toBeInTheDocument();
+      expect(screen.getByText("IN_PROGRESS")).toBeInTheDocument();
     });
 
     it("should not render status badge in compact variant", () => {
       render(<TaskCard task={mockTask} variant="compact" />);
-      const badges = screen.queryAllByText("in-progress");
+      const badges = screen.queryAllByText("IN_PROGRESS");
       expect(badges.length).toBe(0);
     });
   });
@@ -49,19 +49,19 @@ describe("TaskCard Component", () => {
   describe("Priority Display", () => {
     it("should render high priority badge", () => {
       render(<TaskCard task={mockTask} />);
-      expect(screen.getByText("high")).toBeInTheDocument();
+      expect(screen.getByText("HIGH")).toBeInTheDocument();
     });
 
     it("should render medium priority badge", () => {
-      const mediumTask = { ...mockTask, priority: "medium" as const };
+      const mediumTask = { ...mockTask, priority: "MEDIUM" as const };
       render(<TaskCard task={mediumTask} />);
-      expect(screen.getByText("medium")).toBeInTheDocument();
+      expect(screen.getByText("MEDIUM")).toBeInTheDocument();
     });
 
     it("should render low priority badge", () => {
-      const lowTask = { ...mockTask, priority: "low" as const };
+      const lowTask = { ...mockTask, priority: "LOW" as const };
       render(<TaskCard task={lowTask} />);
-      expect(screen.getByText("low")).toBeInTheDocument();
+      expect(screen.getByText("LOW")).toBeInTheDocument();
     });
   });
 
@@ -101,7 +101,7 @@ describe("TaskCard Component", () => {
     it("should display blocked reason when task is blocked", () => {
       const blockedTask = {
         ...mockTask,
-        status: "blocked" as const,
+        status: "BLOCKED" as const,
         blockedReason: "Waiting for approval",
       };
       render(<TaskCard task={blockedTask} />);
@@ -120,7 +120,7 @@ describe("TaskCard Component", () => {
       const taskWithAI = {
         ...mockTask,
         aiSuggestions: {
-          suggestedPriority: "high" as const,
+          suggestedPriority: "HIGH" as const,
           reason: "Important deadline",
           confidence: 0.9,
         },

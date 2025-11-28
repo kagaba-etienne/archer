@@ -9,8 +9,7 @@ import type { CreateGoalDto, Goal } from "@/types";
 const goalSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title too long"),
   description: z.string().max(500, "Description too long").optional(),
-  horizon: z.enum(["short-term", "mid-term", "long-term"]),
-  targetDate: z.string().optional(),
+  horizon: z.enum(["SHORT_TERM", "MID_TERM", "LONG_TERM"]),
 });
 
 type GoalFormData = z.infer<typeof goalSchema>;
@@ -42,27 +41,25 @@ export function GoalForm({
           title: initialData.title,
           description: initialData.description,
           horizon: initialData.horizon,
-          targetDate: initialData.targetDate
-            ? new Date(initialData.targetDate).toISOString().split("T")[0]
-            : undefined,
         }
       : {
-          horizon: "mid-term",
+          horizon: "MID_TERM",
         },
   });
 
   const handleFormSubmit = (data: GoalFormData) => {
-    onSubmit({
-      ...data,
-      targetDate: data.targetDate ? new Date(data.targetDate) : undefined,
-    });
+    onSubmit(data);
+  };
+
+  const handleClose = () => {
     reset();
+    onClose();
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={initialData ? "Edit Goal" : "Create Goal"}
       size="md"
     >
@@ -99,17 +96,11 @@ export function GoalForm({
             className="w-full px-3 focus:outline-0 py-2 border border-border-medium rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
             {...register("horizon")}
           >
-            <option value="short-term">Short-term (0-3 months)</option>
-            <option value="mid-term">Mid-term (3-12 months)</option>
-            <option value="long-term">Long-term (1+ years)</option>
+            <option value="SHORT_TERM">Short-term (0-3 months)</option>
+            <option value="MID_TERM">Mid-term (3-12 months)</option>
+            <option value="LONG_TERM">Long-term (1+ years)</option>
           </select>
         </div>
-
-        <Input
-          label="Target Date (Optional)"
-          type="date"
-          {...register("targetDate")}
-        />
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="ghost" onClick={onClose}>
