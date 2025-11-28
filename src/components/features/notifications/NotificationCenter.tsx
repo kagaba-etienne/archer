@@ -38,7 +38,7 @@ export function NotificationCenter() {
   };
 
   return (
-    <div className="h-full flex flex-col w-[96vw] md:w-md">
+    <div className="h-full flex flex-col w-[80vw] md:w-md">
       {/* Header */}
       <div className="border-b border-border-light">
         <div className="pt-4 flex gap-2 flex-col items-center justify-between mb-3">

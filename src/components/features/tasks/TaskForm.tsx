@@ -8,15 +8,15 @@ import type { CreateTaskDto, Task } from "@/types";
 const taskSchema = z.object({
   title: z.string().min(1, "Title is required").max(100, "Title too long"),
   description: z.string().max(500, "Description too long").optional(),
-  priority: z.enum(["low", "medium", "high"]),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
   status: z
     .enum([
-      "created",
-      "scheduled",
-      "in-progress",
-      "blocked",
-      "completed",
-      "archived",
+      "CREATED",
+      "SCHEDULED",
+      "IN_PROGRESS",
+      "COMPLETED",
+      "CANCELLED",
+      "BLOCKED",
     ])
     .optional(),
   blockedReason: z.string().max(200, "Blocked reason too long").optional(),
@@ -48,7 +48,7 @@ export function TaskForm({
   } = useForm<TaskFormData>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
-      priority: "medium",
+      priority: "MEDIUM",
     },
   });
 
@@ -70,7 +70,7 @@ export function TaskForm({
         reset({
           title: "",
           description: "",
-          priority: "medium",
+          priority: "MEDIUM",
           status: undefined,
           blockedReason: undefined,
           dueDate: undefined,
@@ -82,7 +82,9 @@ export function TaskForm({
   const handleFormSubmit = (data: TaskFormData) => {
     onSubmit({
       ...data,
-      dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+      dueDate: data.dueDate
+        ? new Date(data.dueDate + "T00:00:00").toISOString()
+        : undefined,
     });
   };
 
@@ -133,16 +135,16 @@ export function TaskForm({
             }}
             {...register("priority")}
           >
-            <option value="low" className="bg-bg-white text-text-primary py-2">
+            <option value="LOW" className="bg-bg-white text-text-primary py-2">
               Low
             </option>
             <option
-              value="medium"
+              value="MEDIUM"
               className="bg-bg-white text-text-primary py-2"
             >
               Medium
             </option>
-            <option value="high" className="bg-bg-white text-text-primary py-2">
+            <option value="HIGH" className="bg-bg-white text-text-primary py-2">
               High
             </option>
           </select>
@@ -164,11 +166,11 @@ export function TaskForm({
               }}
               {...register("status")}
             >
-              <option value="created">Created</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="in-progress">In Progress</option>
-              <option value="blocked">Blocked</option>
-              <option value="completed">Completed</option>
+              <option value="CREATED">Created</option>
+              <option value="SCHEDULED">Scheduled</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="CANCELLED">Cancelled</option>
             </select>
           </div>
         )}

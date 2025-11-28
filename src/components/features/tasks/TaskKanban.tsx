@@ -19,11 +19,11 @@ import { useUpdateTask } from "@/services/mutations/useTasks";
 import type { TaskStatus, Task, TaskFilters } from "@/types";
 
 const KANBAN_COLUMNS: { status: TaskStatus; label: string }[] = [
-  { status: "created", label: "Created" },
-  { status: "scheduled", label: "Scheduled" },
-  { status: "in-progress", label: "In Progress" },
-  { status: "blocked", label: "Blocked" },
-  { status: "completed", label: "Completed" },
+  { status: "CREATED", label: "Created" },
+  { status: "SCHEDULED", label: "Scheduled" },
+  { status: "IN_PROGRESS", label: "In Progress" },
+  { status: "BLOCKED", label: "Blocked" },
+  { status: "COMPLETED", label: "Completed" },
 ];
 
 function DroppableColumn({

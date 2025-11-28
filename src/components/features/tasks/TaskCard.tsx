@@ -16,19 +16,19 @@ export interface TaskCardProps {
 
 const getPriorityStyles = (priority: Task["priority"]) => {
   switch (priority) {
-    case "high":
+    case "HIGH":
       return {
         color: "text-accent-warning",
         bg: "bg-accent-warning/10",
         icon: "text-accent-warning",
       };
-    case "medium":
+    case "MEDIUM":
       return {
         color: "text-secondary",
         bg: "bg-secondary/10",
         icon: "text-secondary",
       };
-    case "low":
+    case "LOW":
       return {
         color: "text-accent-success",
         bg: "bg-accent-success/10",
@@ -151,7 +151,7 @@ export function TaskCard({
             )}
 
             {/* Goals */}
-            {task.goalIds.length > 0 && (
+            {task.goalIds && task.goalIds.length > 0 && (
               <div className="flex items-center gap-1">
                 <Target className={isCompact ? "h-3 w-3" : "h-4 w-4"} />
                 <span>
@@ -163,9 +163,9 @@ export function TaskCard({
           </div>
 
           {/* Blocked Reason */}
-          {task.status === "blocked" && task.blockedReason && (
+          {task.status === "BLOCKED" && task.blockedReason && (
             <div
-              className={`p-2 bg-accent-error/10 rounded ${isCompact ? "text-xs" : "text-sm"} text-accent-error`}
+              className={`p-2 bg-accent-warning/10 border border-accent-warning/20 rounded ${isCompact ? "text-xs" : "text-sm"} text-accent-warning`}
             >
               <strong>Blocked:</strong> {task.blockedReason}
             </div>

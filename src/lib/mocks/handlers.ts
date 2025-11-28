@@ -73,29 +73,31 @@ export const authHandlers = [
     ) {
       currentUser = mockUser;
 
-      return HttpResponse.json(mockUser, {
-        status: 200,
-        headers: {
-          "Set-Cookie": "auth-token=mock-jwt-token; HttpOnly; Secure; Path=/",
+      return HttpResponse.json(
+        {
+          user: mockUser,
+          token: "mock-jwt-token-12345",
         },
-      });
+        {
+          status: 200,
+        },
+      );
     }
 
     // Invalid credentials
     return HttpResponse.json(
       {
-        message: "Invalid email or password",
-        code: "INVALID_CREDENTIALS",
+        error: "Invalid credentials",
       },
       { status: 401 },
     );
   }),
 
   /**
-   * POST /auth/signup
+   * POST /auth/register
    * Register a new user
    */
-  http.post(`${API_BASE_URL}/auth/signup`, async ({ request }) => {
+  http.post(`${API_BASE_URL}/auth/register`, async ({ request }) => {
     await delay(700); // Simulate network latency
 
     const userData = (await request.json()) as RegisterUserDto;
@@ -104,11 +106,9 @@ export const authHandlers = [
     if (userData.email === mockCredentials.email) {
       return HttpResponse.json(
         {
-          message: "Email already in use",
-          code: "EMAIL_EXISTS",
-          field: "email",
+          error: "User already exists",
         },
-        { status: 409 },
+        { status: 400 },
       );
     }
 
@@ -124,12 +124,15 @@ export const authHandlers = [
 
     currentUser = newUser;
 
-    return HttpResponse.json(newUser, {
-      status: 201,
-      headers: {
-        "Set-Cookie": "auth-token=mock-jwt-token; HttpOnly; Secure; Path=/",
+    return HttpResponse.json(
+      {
+        user: newUser,
+        token: "mock-jwt-token-67890",
       },
-    });
+      {
+        status: 201,
+      },
+    );
   }),
 
   /**
@@ -298,7 +301,6 @@ export const goalHandlers = [
       title: data.title,
       description: data.description,
       horizon: data.horizon,
-      targetDate: data.targetDate,
       progress: 0,
       taskIds: [],
       createdAt: new Date(),
@@ -563,9 +565,9 @@ export const taskHandlers = [
       userId: currentUser.id,
       title: data.title,
       description: data.description,
-      priority: data.priority,
-      status: "created",
-      dueDate: data.dueDate,
+      priority: data.priority || "MEDIUM",
+      status: "CREATED",
+      dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
       goalIds: data.goalIds || [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -604,6 +606,11 @@ export const taskHandlers = [
     tasks[taskIndex] = {
       ...tasks[taskIndex],
       ...updates,
+      dueDate: updates.dueDate
+        ? typeof updates.dueDate === "string"
+          ? new Date(updates.dueDate)
+          : updates.dueDate
+        : tasks[taskIndex].dueDate,
       updatedAt: new Date(),
     };
 
@@ -656,14 +663,14 @@ export const taskHandlers = [
 
     const stats = {
       total: userTasks.length,
-      completed: userTasks.filter((t) => t.status === "completed").length,
-      inProgress: userTasks.filter((t) => t.status === "in-progress").length,
-      blocked: userTasks.filter((t) => t.status === "blocked").length,
-      scheduled: userTasks.filter((t) => t.status === "scheduled").length,
-      created: userTasks.filter((t) => t.status === "created").length,
-      highPriority: userTasks.filter((t) => t.priority === "high").length,
-      mediumPriority: userTasks.filter((t) => t.priority === "medium").length,
-      lowPriority: userTasks.filter((t) => t.priority === "low").length,
+      completed: userTasks.filter((t) => t.status === "COMPLETED").length,
+      inProgress: userTasks.filter((t) => t.status === "IN_PROGRESS").length,
+      blocked: userTasks.filter((t) => t.status === "BLOCKED").length,
+      scheduled: userTasks.filter((t) => t.status === "SCHEDULED").length,
+      created: userTasks.filter((t) => t.status === "CREATED").length,
+      highPriority: userTasks.filter((t) => t.priority === "HIGH").length,
+      mediumPriority: userTasks.filter((t) => t.priority === "MEDIUM").length,
+      lowPriority: userTasks.filter((t) => t.priority === "LOW").length,
     };
 
     return HttpResponse.json(stats, { status: 200 });

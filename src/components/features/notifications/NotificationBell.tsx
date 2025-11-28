@@ -35,7 +35,7 @@ export function NotificationBell() {
         className="relative p-2 rounded-lg hover:bg-bg-gray transition-colors"
         aria-label="Notifications"
       >
-        <Bell className="h-5 w-5 text-text-primary" />
+        <Bell className="h-4 w-4 text-text-primary" />
 
         {/* Unread Badge */}
         {unreadCount !== undefined && unreadCount > 0 && (
@@ -53,7 +53,7 @@ export function NotificationBell() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-20 md:w-md md:-translate-x-[77%] -left-4 md:top-24 mt-2 max-h-[calc(100vh-5rem)] sm:max-h-[600px] bg-bg-white border border-border-light md:rounded-lg shadow-lg overflow-hidden z-50 overflow-y-auto styled-scrollbar"
+            className="absolute top-20 translate-x-1/2 md:-translate-x-1/2 right-0 md:left-0 z-50 md:w-md md:top-24 mt-2 max-h-[calc(100vh-5rem)] sm:max-h-[600px] bg-bg-white border border-border-light rounded-lg shadow-lg overflow-hidden overflow-y-auto styled-scrollbar"
           >
             <NotificationCenter />
           </motion.div>

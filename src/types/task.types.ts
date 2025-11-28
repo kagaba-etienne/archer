@@ -1,21 +1,21 @@
 /**
- * Task status from state diagram
- * Created → Scheduled → InProgress → Completed → Archived
+ * Task status from state diagram (matches Prisma enum)
+ * CREATED → SCHEDULED → IN_PROGRESS → COMPLETED
  *              ↓           ↓
- *          Blocked ←→ InProgress
+ *           BLOCKED
  */
 export type TaskStatus =
-  | "created"
-  | "scheduled"
-  | "in-progress"
-  | "blocked"
-  | "completed"
-  | "archived";
+  | "CREATED"
+  | "SCHEDULED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "BLOCKED";
 
 /**
- * Task priority levels
+ * Task priority levels (matches Prisma enum)
  */
-export type TaskPriority = "low" | "medium" | "high";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH";
 
 /**
  * Task entity from UML class diagram
@@ -54,8 +54,8 @@ export interface TaskAISuggestions {
 export interface CreateTaskDto {
   title: string;
   description?: string;
-  priority: TaskPriority;
-  dueDate?: Date;
+  priority?: TaskPriority;
+  dueDate?: Date | string;
   goalIds?: string[];
 }
 
@@ -67,7 +67,7 @@ export interface UpdateTaskDto {
   description?: string;
   priority?: TaskPriority;
   status?: TaskStatus;
-  dueDate?: Date;
+  dueDate?: Date | string;
   scheduledDate?: Date;
   blockedReason?: string;
   goalIds?: string[];

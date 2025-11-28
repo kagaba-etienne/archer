@@ -65,7 +65,7 @@ export default function SignupPage() {
       {/* Left side - Image (hidden on mobile) */}
       <div className="hidden lg:flex lg:w-1/2 relative lg:fixed lg:inset-y-0 lg:left-0">
         <Image
-          src="/assassins-creed-7680x4320-21654.jpg"
+          src="/Logo.png"
           alt="Archer App"
           fill
           className="object-cover"

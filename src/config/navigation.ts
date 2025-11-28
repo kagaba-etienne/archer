@@ -43,7 +43,6 @@ export const navigationConfig: NavConfig = {
       label: "Calendar",
       href: "/dashboard/settings/calendar",
       icon: Calendar,
-      divider: true,
     },
   ],
   secondary: [

@@ -18,25 +18,31 @@ export class APIError extends Error {
 }
 
 /**
- * Base API request function with cookie-based authentication
+ * Base API request function with JWT token authentication
  *
- * CRITICAL: Always includes credentials for httpOnly cookies
+ * CRITICAL: Sends JWT token as Bearer token in Authorization header
  */
 export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
+  const token = useAuthStore.getState().token;
 
   try {
-    // CRITICAL: credentials: 'include' sends httpOnly cookies
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...(options.headers as Record<string, string>),
+    };
+
+    // Add Authorization header if token exists
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       ...options,
-      credentials: "include", // Required for cookie-based auth
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
+      headers,
     });
 
     // Handle 401 Unauthorized - token expired or invalid

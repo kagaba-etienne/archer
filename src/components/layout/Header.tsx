@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Menu, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Menu, ChevronDown, BowArrow } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { NotificationBell } from "@/components/features/notifications/NotificationBell";
 import { useAuthStore } from "@/stores/authStore";
@@ -16,6 +16,23 @@ export function Header({ onToggleSidebar }: HeaderProps) {
   const user = useAuthStore((state) => state.user);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
+  // handle on outside click to close user menu
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     useAuthStore.getState().logout();
     router.push("/login");
@@ -28,15 +45,15 @@ export function Header({ onToggleSidebar }: HeaderProps) {
         <div className="flex items-center gap-4">
           <button
             onClick={onToggleSidebar}
-            className="p-2 rounded-lg hover:bg-bg-gray md:hidden"
+            className="rounded-lg hover:text-primary cursor-pointer md:hidden"
             aria-label="Toggle sidebar"
           >
             <Menu className="h-5 w-5" />
           </button>
 
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <span className="text-lg font-bold text-white">A</span>
+            <div className="w-6 h-6 bg-primary flex items-center justify-center rounded-sm">
+              <BowArrow className="h-4 w-4 text-white" />
             </div>
             <span className="text-lg font-bold text-primary hidden sm:inline">
               Archer
@@ -50,13 +67,13 @@ export function Header({ onToggleSidebar }: HeaderProps) {
           <NotificationBell />
 
           {/* User Menu */}
-          <div className="relative">
+          <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-bg-gray transition-colors"
+              className="flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-bg-gray transition-colors"
             >
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
-                <span className="text-sm font-bold text-primary">
+              <div className="flex items-center justify-center w-6 h-6 rounded-sm bg-primary/10">
+                <span className="text-2xl font-bold text-primary">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
@@ -65,7 +82,7 @@ export function Header({ onToggleSidebar }: HeaderProps) {
 
             {/* Dropdown */}
             {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-bg-white border border-border-light rounded-lg shadow-lg overflow-hidden">
+              <div className="absolute right-0 mt-2 w-64 bg-bg-white border border-border-light rounded-lg shadow-lg overflow-hidden">
                 <div className="p-3 border-b border-border-light">
                   <p className="text-sm font-medium text-text-primary">
                     {user?.name}

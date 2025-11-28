@@ -4,28 +4,34 @@ import type { User, LoginCredentials, RegisterUserDto } from "@/types";
 
 /**
  * Login user
- * Backend sets httpOnly cookie in response
+ * Stores JWT token in memory and user profile
  */
 export async function login(credentials: LoginCredentials): Promise<User> {
-  const user = await apiPost<User>("/auth/login", credentials);
+  const response = await apiPost<{ user: User; token: string }>(
+    "/auth/login",
+    credentials,
+  );
 
-  // Store user profile (NOT token - that's in httpOnly cookie)
-  useAuthStore.getState().setUser(user);
+  // Store user profile and token
+  useAuthStore.getState().setAuth(response.user, response.token);
 
-  return user;
+  return response.user;
 }
 
 /**
  * Register new user
- * Backend sets httpOnly cookie in response
+ * Stores JWT token in memory and user profile
  */
 export async function signup(data: RegisterUserDto): Promise<User> {
-  const user = await apiPost<User>("/auth/signup", data);
+  const response = await apiPost<{ user: User; token: string }>(
+    "/auth/register",
+    data,
+  );
 
-  // Store user profile
-  useAuthStore.getState().setUser(user);
+  // Store user profile and token
+  useAuthStore.getState().setAuth(response.user, response.token);
 
-  return user;
+  return response.user;
 }
 
 /**

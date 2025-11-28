@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export function UpcomingTasksWidget() {
   const router = useRouter();
   const { data: tasks, isLoading } = useTasksQuery({
-    status: ["created", "scheduled", "in-progress"],
+    status: ["CREATED", "SCHEDULED", "IN_PROGRESS"],
   });
 
   // Get next 5 upcoming tasks

@@ -1,0 +1,198 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  name          String
+  password      String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  tasks         Task[]
+  goals         Goal[]
+  reflections   Reflection[]
+  insights      Insight[]
+  notifications Notification[]
+  calendarAccounts CalendarAccount[]
+
+  @@index([email])
+}
+
+// Task model
+model Task {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?
+  status        TaskStatus @default(CREATED)
+  priority      Priority   @default(MEDIUM)
+  dueDate       DateTime?
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  goalLinks     GoalTask[]
+  
+  @@index([userId])
+  @@index([status])
+}
+
+enum TaskStatus {
+  CREATED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  BLOCKED
+}
+
+// Goal model
+model Goal {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String
+  description   String?
+  horizon       Horizon    @default(MID_TERM)
+  progress      Int        @default(0)
+  status        GoalStatus @default(ACTIVE)
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  taskLinks     GoalTask[]
+  
+  @@index([userId])
+  @@index([status])
+}
+
+enum Horizon {
+  SHORT_TERM
+  MID_TERM
+  LONG_TERM
+}
+
+enum GoalStatus {
+  ACTIVE
+  ACHIEVED
+  ABANDONED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Goal-Task relationship (many-to-many)
+model GoalTask {
+  id            String     @id @default(cuid())
+  goalId        String
+  goal          Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  taskId        String
+  task          Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime   @default(now())
+
+  @@unique([goalId, taskId])
+}
+
+// Reflection model
+model Reflection {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  content       String
+  sentiment     Sentiment?
+  sentimentScore Float?
+  summary       String?
+  tags          String[]
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([sentiment])
+}
+
+enum Sentiment {
+  POSITIVE
+  NEUTRAL
+  NEGATIVE
+}
+
+// Insight model
+model Insight {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  alignmentScore Int
+  recommendation String
+  category      String
+  
+  createdAt     DateTime   @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Notification model
+model Notification {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String
+  message       String
+  type          NotificationType
+  read          Boolean    @default(false)
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([userId])
+  @@index([read])
+}
+
+enum NotificationType {
+  TASK_REMINDER
+  GOAL_MILESTONE
+  AI_INSIGHT
+  SYSTEM
+}
+
+// Calendar Account model
+model CalendarAccount {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  email         String
+  accessToken   String
+  refreshToken  String?
+  calendars     String[]   // List of calendar IDs
+  
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([userId, email])
+}

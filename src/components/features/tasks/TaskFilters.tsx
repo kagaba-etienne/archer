@@ -17,13 +17,14 @@ export function TaskFilters({
   viewMode = "list",
 }: TaskFiltersProps) {
   const statuses: TaskStatus[] = [
-    "created",
-    "scheduled",
-    "in-progress",
-    "blocked",
-    "completed",
+    "CREATED",
+    "SCHEDULED",
+    "IN_PROGRESS",
+    "COMPLETED",
+    "CANCELLED",
+    "BLOCKED",
   ];
-  const priorities: TaskPriority[] = ["low", "medium", "high"];
+  const priorities: TaskPriority[] = ["LOW", "MEDIUM", "HIGH"];
 
   const toggleStatus = (status: TaskStatus) => {
     const currentStatuses = Array.isArray(filters.status)
