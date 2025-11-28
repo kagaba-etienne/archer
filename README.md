@@ -343,4 +343,4 @@ npm run db:push
 
 ## Hosted Version
 
-[🚀 **Live Demo**](https://vercel.com/kagabaetiennes-projects/archer/Dgd2Tt9z41iQErUDJDtFuk1qzyRW)
+[🚀 **Live Demo**](https://archer-gamma.vercel.app/)

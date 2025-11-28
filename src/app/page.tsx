@@ -66,12 +66,6 @@ export default function Home() {
             </Button>
           </Link>
         </div>
-
-        <div className="mt-12 pt-12 border-t border-border-light">
-          <p className="text-sm text-text-muted">
-            Phase 5: Authentication System Complete ✓
-          </p>
-        </div>
       </div>
     </main>
   );
